@@ -1,0 +1,21 @@
+{
+  "name": "testproject",
+  "version": "1.0.0",
+  "description": "just a test",
+  "type": "commonjs",
+  "main": "helloworld.js",
+  "scripts": {
+    "test": "hello"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "fs": "^0.0.1-security"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
