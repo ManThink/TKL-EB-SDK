@@ -9,22 +9,17 @@ class JS_Obin {
         this.otaFile = ota;
     }
 
-    saveObin(binfile, lstBytes = []) {
+    saveObin(lstBytes = []) {
         this.otaFile.buildFuotaPackets(lstBytes);
-        const obinFile = path.join(path.dirname(binfile), `${path.basename(binfile, '.bin')}.obin`);
-        try {
-            delete this.otaFile.binFile;
-            delete this.otaFile.obinUse;
-            delete this.otaFile.upgradeAddr;
-            delete this.otaFile.fragSize;
-            delete this.otaFile.lstRunPara;
-            const jsonString = JSON.stringify(this);
-            fs.writeFileSync(obinFile, jsonString);
-            return true;
-        } catch (ex) {
-            return false;
-        }
+        delete this.otaFile.binFile;
+        delete this.otaFile.obinUse;
+        delete this.otaFile.upgradeAddr;
+        delete this.otaFile.fragSize;
+        delete this.otaFile.lstRunPara;
+        const jsonString = JSON.stringify(this);
+        return jsonString
     }
+   
 }
 
 class FuotaUpgrade_Range {
@@ -41,8 +36,8 @@ const ObinUsage = {
 };
 
 class DTU_OtaFile {
-    constructor(binfile = '', opt = {}, para = {}, isClassA) {
-        this.binFile = binfile;
+    constructor(binBuffer, opt = {}, para = {}, isClassA) {
+        this.binBuffer = binBuffer;
         this.obinUse = ObinUsage.UpgradeBllPara;
         this.upgradeAddr = 0;
         this.fragSize = 0;
@@ -101,9 +96,9 @@ class DTU_OtaFile {
     buildFuotaPackets(lstBytes = []) {
         let lstFuotaPackets = null;
         if (this.obinUse === ObinUsage.UpgradeFirmware) {
-            lstFuotaPackets = new MT_BllFuotaPackets(this.binFile, this.fragSize).getFirmwareFuotaPacktes(this.upgradeAddr, this.lstRunPara);
+            lstFuotaPackets = new MT_BllFuotaPackets(this.binBuffer, this.fragSize).getFirmwareFuotaPacktes(this.upgradeAddr, this.lstRunPara);
         } else {
-            lstFuotaPackets = new MT_BllFuotaPackets(this.binFile, this.fragSize).getBllFuotaPackets(this.lstRunPara, lstBytes);
+            lstFuotaPackets = new MT_BllFuotaPackets(this.binBuffer, this.fragSize).getBllFuotaPackets(this.lstRunPara, lstBytes);
         }
         if (!lstFuotaPackets || lstFuotaPackets.length < 2) {
             console.log('build obin file failed!');

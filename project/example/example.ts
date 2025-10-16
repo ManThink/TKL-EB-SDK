@@ -1,8 +1,8 @@
 
 import { Buffer } from "buffer";
-import { buildOtaFile } from "../../EBSDK/run";
-import { CrcMode, EBBuffer, EBModel, ExprCondition, LoraUpEvent, QueryEvent } from "../../EBSDK/EBCompiler/all_variable";
-import { CheckbitEnum, getOtaConfig, HwTypeEnum, UpgrdTypeEnum } from "../../EBSDK/otaConfig";
+import { buildOtaFile } from "@EBSDK/run";
+import { CrcMode, EBBuffer, EBModel, ExprCondition, LoraUpEvent, QueryEvent } from "@EBSDK/EBCompiler/all_variable";
+import { CheckbitEnum, getOtaConfig, HwTypeEnum, UpgrdTypeEnum } from "@EBSDK/otaConfig";
 
 
 let otaConfig = getOtaConfig({

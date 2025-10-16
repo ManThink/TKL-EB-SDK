@@ -22,13 +22,13 @@ const FuotaHandle = {
 };
 
 class MT_BllFuotaPackets {
-    constructor(binfile, fragsize) {
+    constructor(binBuffer, fragsize) {
         this.BLL_MAXSIZE = 2048;
         this.BIN_HEADER = 0x55;
         this.BIN_TAIL = 0xAA;
         this.BLOCK_SIZE = 1024;
         this.CRC_SIZE = 2;
-        this.binFile = binfile;
+        this.binBuffer = binBuffer;
         this.fragSize = fragsize;
         this.fragIndex = 0;
         this.mcGroupBitMask = 0;
@@ -57,7 +57,7 @@ class MT_BllFuotaPackets {
     readBllBin() {
         let lstBytes = [];
         try {
-            const data = fs.readFileSync(this.binFile);
+            const data = this.binBuffer;
             const len = data[4] + (data[5] << 8);
             if (!this.checkBlock(data.slice(0, this.BLOCK_SIZE))) {
                 console.log("wrong crc of first block!");
@@ -89,7 +89,7 @@ class MT_BllFuotaPackets {
     readFirmwareBin() {
         let lstBytes = [];
         try {
-            const data = fs.readFileSync(this.binFile);
+            const data = this.binBuffer;
             lstBytes = lstBytes.concat(data);
         } catch (ex) {
             console.log("reading bin file failed: " + ex.toString());
