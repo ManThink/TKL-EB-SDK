@@ -61,8 +61,8 @@ export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, M
 
   return {
     otaConfig: otaConfig,
-    interJson: interJson,
+    interJson: JSON.parse(interJson),
     binBuffer: binBuffer,
-    obin: obinString
+    obin: JSON.parse(obinString)
   }
 }

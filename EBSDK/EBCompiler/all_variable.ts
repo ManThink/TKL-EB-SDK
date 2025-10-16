@@ -7,4 +7,6 @@ export * from "@EBSDK/EBCompiler/EBModel/EBRule";
 export * from "@EBSDK/EBCompiler/EBModel/EBModel"
 export * from "@EBSDK/EBCompiler/EBModel/EBExpr";
 export * from "@EBSDK/EBCompiler/EBModel/interface"
+export * from "@EBSDK/otaConfig";
+export * from "@EBSDK/run"
 

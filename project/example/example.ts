@@ -17,7 +17,7 @@ let otaConfig = getOtaConfig({
   BzType: null, // 必填项
   BzVersion: null // 必填项
 })
-export const MODBUS_TT = (ebModel: EBModel) => {
+const MODBUS_TT = (ebModel: EBModel) => {
   const APP = new EBBuffer("app", Buffer.alloc(255));
   const APP_STATUS = new EBBuffer("appsts", Buffer.alloc(32));
   const SENSOR_DATA = new EBBuffer("sensor", Buffer.alloc(128));
