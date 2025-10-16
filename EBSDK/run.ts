@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
-import { CalcData, CrcMode, EBBuffer, EBModel, ExprCondition, LoraUpEvent, QueryEvent } from "./EBCompiler/all_variable";
-import path, { join, resolve } from "path";
+import { EBModel, LoraUpEvent, QueryEvent } from "@EBSDK/EBCompiler/all_variable";
+import path, { join } from "path";
 import { OtaConfig } from "@EBSDK/otaConfig";
 
 const {EBBinCompile} = require("./EBObin/eb-compile.js")

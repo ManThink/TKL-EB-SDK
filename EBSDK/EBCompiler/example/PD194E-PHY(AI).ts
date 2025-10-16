@@ -1,5 +1,5 @@
-import { EBModel } from "../EBModel/EBModel";
-import { CalcData, CrcMode, EBBuffer, ExprCondition, LoraUpEvent, QueryEvent } from "../all_variable";
+import { EBModel } from "@EBSDK/EBCompiler/EBModel/EBModel";
+import { CrcMode, EBBuffer, ExprCondition, LoraUpEvent, QueryEvent } from "@EBSDK/EBCompiler/all_variable";
 import { Buffer } from "buffer";
 
 export const SE_QueryAndLoraUp = (ebModel: EBModel) => {

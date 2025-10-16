@@ -1,10 +1,10 @@
-export { BaseEvent} from "./EBModel/Event/BaseEvent";
-export { LoraUpEvent } from "./EBModel/Event/LoraUpEvent";
-export { QueryEvent } from "./EBModel/Event/QueryEvent";
-export * from "./EBModel/EBBuffer";
-export * from "./EBModel/EBEnum";
-export * from "./EBModel/EBRule";
-export * from "./EBModel/EBModel"
-export * from "./EBModel/EBExpr";
-export * from "./EBModel/interface"
+export { BaseEvent} from "@EBSDK/EBCompiler/EBModel/Event/BaseEvent";
+export { LoraUpEvent } from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
+export { QueryEvent } from "@EBSDK/EBCompiler/EBModel/Event/QueryEvent";
+export * from "@EBSDK/EBCompiler/EBModel/EBBuffer";
+export * from "@EBSDK/EBCompiler/EBModel/EBEnum";
+export * from "@EBSDK/EBCompiler/EBModel/EBRule";
+export * from "@EBSDK/EBCompiler/EBModel/EBModel"
+export * from "@EBSDK/EBCompiler/EBModel/EBExpr";
+export * from "@EBSDK/EBCompiler/EBModel/interface"
 
