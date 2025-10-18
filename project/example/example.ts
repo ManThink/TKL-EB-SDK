@@ -145,5 +145,8 @@ const MODBUS_TT = (ebModel: EBModel) => {
   return JSON.stringify(ebModel, null, 2)
 }
 
+function main() {
+  return buildOtaFile(__filename, otaConfig, MODBUS_TT)
+}
 
-buildOtaFile(__filename, otaConfig, MODBUS_TT)
+main()

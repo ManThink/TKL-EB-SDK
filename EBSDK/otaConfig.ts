@@ -90,7 +90,7 @@ export enum UpgrdTypeEnum{
   SP = "sp"
 }
 
-interface GetOtaConfigInput {
+export interface GetOtaConfigInput {
   UpgrdType: OtaConfig["UpgradeOption"]["UpgrdType"];
 
   HwType: OtaConfig["AppPara"]["HwType"];
