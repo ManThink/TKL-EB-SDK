@@ -198,6 +198,7 @@ export class QueryEvent extends BaseEvent {
     return {
       
       ...super.toJSON(),
+      MulDev_NewGrpStart: this.MulDev_NewGrpStart,
       queryPeriod: this.queryPeriod,
       ackBuffer: this.ackBuffer,
       cmdBuffer: this.cmdBuffer,
