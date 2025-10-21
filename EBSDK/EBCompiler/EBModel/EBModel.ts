@@ -66,7 +66,11 @@ export class EBModel {
       throw Error(`请初始化事件名称`);
     }
     if ([LoraUpEvent.name, QueryEvent.name].includes(event.constructor.name)) {
-      (this as any)[`${event.constructor.name}List`].push(event);
+      if (event instanceof LoraUpEvent) {
+        this.LoraUpEventList.push(event)
+      } else if (event instanceof QueryEvent){
+        this.QueryEventList.push(event);
+      }
     } else {
       throw Error("实例类型不匹配，请使用 LoraUpEvent 或 QueryEvent");
     }

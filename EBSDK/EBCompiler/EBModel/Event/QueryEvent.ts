@@ -18,6 +18,7 @@ export class QueryEvent extends BaseEvent {
   protected tagCheckList: Array<TagCheckProp> = []; // 标签检查列表
   protected fixedAcq!: boolean; // 是否固定采集
   protected fixedMoment!: number; // 固定采集时刻
+  protected MulDev_NewGrpStart: boolean; // 一带多DTU查询指令的分组起始位置标识.
 
   /**
    * 构造函数
@@ -25,11 +26,14 @@ export class QueryEvent extends BaseEvent {
    * @param {Object} options - 事件配置
    * @param {Buffer} options.ackBuffer - 485设备返回的数据的缓存区
    * @param {Buffer} options.cmdBuffer - 下发给485设备的查询命令缓存区
+   * @param {boolean} options.MulDev_NewGrpStart - 一带多DTU查询指令的分组起始位置标识.
+   *  - 开启此标识后，DTU支持一带多设备通信
+   *  - 仅需在新的查询分组开始时需要设置此标志位
    * @throws {Error} - 如果未设置QueryEvent.ebModel，抛出错误
    */
   constructor(
     name: string,
-    { ackBuffer, cmdBuffer }: { ackBuffer: Buffer; cmdBuffer: Buffer }
+    { ackBuffer, cmdBuffer, MulDev_NewGrpStart=false }: { ackBuffer: Buffer; cmdBuffer: Buffer; MulDev_NewGrpStart?:boolean}
   ) {
     if (!QueryEvent.ebModel) {
       throw new Error(
@@ -39,6 +43,7 @@ export class QueryEvent extends BaseEvent {
     super(name);
     this.ackBuffer = new EBBuffer(`ack`, ackBuffer);
     this.cmdBuffer = new EBBuffer(`cmd`, cmdBuffer);
+    this.MulDev_NewGrpStart = !!MulDev_NewGrpStart;
     QueryEvent.ebModel?.addEvent(this);
   }
 
