@@ -183,7 +183,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
       // "BzType": 416,
       // "BzVersion": 10, 
       "FilterMask": 0,
-      "OtaMask": 7,
+      "OtaMask": 6,
       "WakeupIn": false,
       "WakeupOut": false,
       "BackHaul": "bh_lorawan",
