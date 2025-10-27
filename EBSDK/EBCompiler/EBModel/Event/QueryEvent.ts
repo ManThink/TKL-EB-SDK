@@ -224,12 +224,6 @@ export class QueryEvent extends BaseEvent {
     return this;
   }
 
-  /**
-   * 设置周期
-   * @param {number} period - 周期值
-   * @param {number} [offsetSecond] - 偏移秒数
-   * @returns {this} - 返回当前对象
-   */
 
   /**
    * Sets the period.
