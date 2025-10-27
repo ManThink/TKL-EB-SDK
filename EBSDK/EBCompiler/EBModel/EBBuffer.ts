@@ -2,18 +2,22 @@ import { CalcData, CopyData, EBExpr } from "./EBExpr";
 import {Buffer} from "buffer"
 
 /**
- * EB编译器的自定义类, 用于存储计算赋值动作以及复制动作中Buffer的读取,写入相关的动作过程
+ * Custom class for the EB compiler, used to store the process of read/write operations
+ * on a Buffer for calculation and copy actions.
  */
 export class EBBuffer {
-  /** 缓冲区的名称 */ 
+  /** The name of the buffer */ 
   private name: string;
-  /** 缓冲区元数据 */
+  /** The buffer metadata */
   private buffer:Buffer = Buffer.alloc(0);
-  /** buffer缓冲区的最大长度 */ 
+  /** The maximum length of the buffer */ 
   private maxLength: number = 0;
 
   /** 
-   * 构造函数，初始化缓冲区名称和缓冲区数据，并根据传入的buffer设置最大长度
+   * Constructor. Initializes the buffer name and data, and sets the maximum length
+   * based on the provided buffer.
+   * @param name The name of the buffer.
+   * @param buffer The initial Buffer object.
    */ 
   constructor(name:string, buffer:Buffer) {
     this.name = name;
@@ -21,28 +25,29 @@ export class EBBuffer {
     this.maxLength = buffer.length;
   }
 
-  /** 获取缓存区 */ 
+  /** Gets the underlying Buffer object. */ 
   getBuffer():Buffer {
     return this.buffer;
   }
 
-  /** 获取EBBuffer实例的名称 */
+  /** Gets the name of the EBBuffer instance. */
   getName():string {
     return this.name;
   }
 
-  /** 将缓冲区数据转换为十六进制字符串 */ 
+  /** Converts the buffer data to a hexadecimal string. */ 
   toJSON() {
     return this.buffer.toString("hex")?.match(/.{2}/g)?.join(' ')?.toUpperCase() || "";
   }
+  
   /** 
-   * 从传入的EBbuffer中复制数据到当前的EBBuffer中
-   * @param source 传入的数据信息,包含以下属性：
-   *  - bufferOffset: 当前缓存区的偏移量, 表示从哪个位置开始读取数据到当前实例中
-   *  - byteLength: 要复制的字节数
-   *  - buffer: 要复制的源缓存区
-   * @param {number} bufferOffset 当前缓存区的偏移量, 表示从哪个位置开始写入数据到当前实例中
-   * @return {CopyData} 返回一个CopyData对象, 并且设置改对象为只读对象, 无法再进行其他操作符运算
+   * Copies data from a source EBBuffer to the current EBBuffer.
+   * @param source The source data information, including:
+   *  - bufferOffset: The offset in the source buffer to start reading from.
+   *  - byteLength: The number of bytes to copy.
+   *  - buffer: The source EBBuffer.
+   * @param bufferOffset The offset in the current buffer to start writing to.
+   * @returns A CopyData object representing the copy action, set as read-only.
    */ 
   copyFrom(source: {
     bufferOffset: number;
@@ -53,444 +58,445 @@ export class EBBuffer {
     return new CopyData(`${this.name}.${bufferOffset}=${vale}`, true)
   }
 
-  /** 从当前缓冲区读取数据，用于内部复制操作 
-   * @param {number} bufferOffset 当前缓存区的偏移量, 表示从哪个位置开始读取数据
-   * @param {number} byteLength 要读取的字节数
-   * @return {CopyData} 返回一个CopyData对象
+  /** 
+   * Reads data from the current buffer for internal copy operations.
+   * @param bufferOffset The offset in the current buffer to start reading from.
+   * @param byteLength The number of bytes to read.
+   * @returns A CopyData object.
    */ 
   _readCopySource(bufferOffset:number, byteLength:number):CopyData {
     return new CopyData(`${this.name}.${bufferOffset}.${byteLength}`);
   }
 
   /**
-   * 读取无符号整数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned integer (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readUintLE( bufferOffset:number, byteLength:number):CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.uint`);
   }
 
   /**
-   * 写入无符号整数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned integer (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUintLE(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readUintLE(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取无符号整数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned integer (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readUintBE(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.uint.b`);
   }
 
   /**
-   * 写入无符号整数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned integer (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUintBE(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readUintBE(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号整数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed integer (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readIntLE(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.int`);
   }
 
   /**
-   * 写入有符号整数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed integer (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeIntLE(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readIntLE(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号整数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed integer (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readIntBE(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.int.b`);
   }
 
   /**
-   * 写入有符号整数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed integer (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeIntBE(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readIntBE(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取无符号8位整数
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned 8-bit integer.
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readUint8(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.1.uint`);
   }
 
   /**
-   * 写入无符号8位整数
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned 8-bit integer.
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUint8(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readUint8(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取无符号16位整数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned 16-bit integer (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readUint16LE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.2.uint`);
   }
 
   /**
-   * 写入无符号16位整数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned 16-bit integer (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUint16LE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readUint16LE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取无符号16位整数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned 16-bit integer (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readUint16BE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.2.uint.b`);
   }
 
   /**
-   * 写入无符号16位整数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned 16-bit integer (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUint16BE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readUint16BE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号8位整数
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed 8-bit integer.
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readInt8(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.1.int`);
   }
 
   /**
-   * 写入有符号8位整数
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed 8-bit integer.
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeInt8(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readInt8(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号16位整数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed 16-bit integer (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readInt16LE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.2.int`);
   }
 
   /**
-   * 写入有符号16位整数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed 16-bit integer (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeInt16LE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readInt16LE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号16位整数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed 16-bit integer (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readInt16BE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.2.int.b`);
   }
 
   /**
-   * 写入有符号16位整数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed 16-bit integer (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeInt16BE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readInt16BE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取无符号32位整数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned 32-bit integer (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readUint32LE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.4.uint`);
   }
 
   /**
-   * 写入无符号32位整数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned 32-bit integer (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUint32LE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readUint32LE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取无符号32位整数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads an unsigned 32-bit integer (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readUint32BE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.4.uint.b`);
   }
 
   /**
-   * 写入无符号32位整数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes an unsigned 32-bit integer (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeUint32BE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readUint32BE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号32位整数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed 32-bit integer (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readInt32LE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.4.int`);
   }
 
   /**
-   * 写入有符号32位整数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed 32-bit integer (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeInt32LE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readInt32LE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取有符号32位整数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a signed 32-bit integer (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readInt32BE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.4.int.b`);
   }
 
   /**
-   * 写入有符号32位整数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a signed 32-bit integer (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeInt32BE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readInt32BE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取浮点数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a 32-bit floating point number (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readFloatLE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.4.float`);
   }
 
   /**
-   * 写入浮点数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a 32-bit floating point number (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeFloatLE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readFloatLE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取浮点数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a 32-bit floating point number (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readFloatBE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.4.float.b`);
   }
 
   /**
-   * 写入浮点数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a 32-bit floating point number (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeFloatBE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readFloatBE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取双精度浮点数（小端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a 64-bit floating point number (Little Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readDoubleLE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.8.double`);
   }
 
   /**
-   * 写入双精度浮点数（小端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a 64-bit floating point number (Little Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeDoubleLE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readDoubleLE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取双精度浮点数（大端字节序）
-   * @param {number} bufferOffset - 读取的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Reads a 64-bit floating point number (Big Endian).
+   * @param bufferOffset The offset to start reading from.
+   * @returns The result as a CalcData object.
    */
   readDoubleBE(bufferOffset: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.8.double.b`);
   }
 
   /**
-   * 写入双精度浮点数（大端字节序）
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @returns {CalcData} - 返回计算结果
+   * Writes a 64-bit floating point number (Big Endian).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeDoubleBE(value: CalcData, offset: number): CalcData {
     return new CalcData(`${this.readDoubleBE(offset).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取ASCII字符串
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads an ASCII string.
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readAscii(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.asc`);
   }
 
   /**
-   * 写入ASCII字符串
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes an ASCII string.
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeAscii(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readAscii(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取XAASC字符串
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads an XAASC string (a custom format).
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readXaasc(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.xaasc`);
   }
 
   /**
-   * 写入XAASC字符串
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes an XAASC string (a custom format).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeXaasc(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readXaasc(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取XAF字符串
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads an XAF string (a custom format).
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readXaf(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.xaf`);
   }
 
   /**
-   * 写入XAF字符串
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes an XAF string (a custom format).
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeXaf(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readXaf(offset, byteLength).getValue()}=${value.getValue()}`, true);
   }
 
   /**
-   * 读取BCD码
-   * @param {number} bufferOffset - 读取的偏移量
-   * @param {number} byteLength - 读取的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Reads a BCD (Binary-Coded Decimal) value.
+   * @param bufferOffset The offset to start reading from.
+   * @param byteLength The length in bytes to read.
+   * @returns The result as a CalcData object.
    */
   readBcd(bufferOffset: number, byteLength: number): CalcData {
     return new CalcData(`${this.name}.${bufferOffset}.${byteLength}.bcd`);
   }
 
   /**
-   * 写入BCD码
-   * @param {CalcData} value - 要写入的值
-   * @param {number} offset - 写入的偏移量
-   * @param {number} byteLength - 写入的字节长度
-   * @returns {CalcData} - 返回计算结果
+   * Writes a BCD (Binary-Coded Decimal) value.
+   * @param value The value to write.
+   * @param offset The offset to start writing to.
+   * @param byteLength The length in bytes to write.
+   * @returns The result as a CalcData object (assignment expression).
    */
   writeBcd(value: CalcData, offset: number, byteLength: number): CalcData {
     return new CalcData(`${this.readBcd(offset, byteLength).getValue()}=${value.getValue()}`, true);

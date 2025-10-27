@@ -7,18 +7,52 @@ import { BaseEvent } from "./BaseEvent";
 import { Buffer } from "buffer";
 
 /**
- * QueryEvent类，用于表示查询事件
+ * QueryEvent class, used to represent a query event.
  */
 export class QueryEvent extends BaseEvent {
-  static ebModel: EBModel | null = null; // 静态属性，用于存储EBModel实例
-  public ackBuffer: EBBuffer = new EBBuffer("ack", Buffer.alloc(0)); // 确认缓冲区
-  public cmdBuffer: EBBuffer = new EBBuffer("cmd", Buffer.alloc(0)); // 命令缓冲区
-  protected ackCrcPara!: CrcPara; // 确认CRC参数
-  protected queryCrcPara!: CrcPara; // 查询CRC参数
-  protected tagCheckList: Array<TagCheckProp> = []; // 标签检查列表
-  protected fixedAcq!: boolean; // 是否固定采集
-  protected fixedMoment!: number; // 固定采集时刻
-  protected MulDev_NewGrpStart: boolean; // 一带多DTU查询指令的分组起始位置标识.
+  /** Static property to store the EBModel instance. */
+  static ebModel: EBModel | null = null; 
+
+  /**
+   * Buffer for downstream meter reading commands.
+   */
+  public cmdBuffer: EBBuffer = new EBBuffer("cmd", Buffer.alloc(0));
+
+  /**
+   * Buffer for device response messages.
+   */
+  public ackBuffer: EBBuffer = new EBBuffer("ack", Buffer.alloc(0)); 
+  
+  /**
+   * CRC parameters for verifying the ackBuffer integrity.
+   */
+  protected ackCrcPara!: CrcPara; 
+  /**
+   * CRC configuration for cmdBuffer command validation.
+   */
+  protected queryCrcPara!: CrcPara;
+  /**
+   * List of tag checks for verifying and matching command validation bytes.
+   */
+  protected tagCheckList: Array<TagCheckProp> = []; 
+
+
+  /**
+   * Whether to enable fixed-time acquisition.
+   * If true, data is collected at regular time intervals based on the query cycle.
+   */
+  protected fixedAcq!: boolean; 
+  /**
+   * The second offset within the query cycle for fixed-time acquisition.
+   * For example, with a 5-minute query cycle, acquisition occurs at second {fixedMoment} 
+   * of every 5-minute interval (e.g., 00:00, 00:05, 00:10, etc.).
+   */
+  protected fixedMoment!: number; 
+
+  /**
+   * Start position identifier for one-to-many DTU query command grouping.
+   */
+  protected MulDev_NewGrpStart: boolean; 
 
   /**
    * 构造函数
@@ -30,6 +64,17 @@ export class QueryEvent extends BaseEvent {
    *  - 开启此标识后，DTU支持一带多设备通信
    *  - 仅需在新的查询分组开始时需要设置此标志位
    * @throws {Error} - 如果未设置QueryEvent.ebModel，抛出错误
+   */
+   /**
+   * Constructor
+   * @param {string} name The name of the event.
+   * @param {Object} options Event configuration.
+   * @param {Buffer} options.ackBuffer  options.ackBuffer The buffer for data returned by the 485 device.
+   * @param {Buffer} options.cmdBuffer The buffer for the query command sent to the 485 device.
+   * @param {boolean} options.MulDev_NewGrpStart Identifier for the start of a new group in a one-to-many DTU query command.
+   *  - Enabling this flag allows the DTU to communicate with multiple devices.
+   *  - This flag only needs to be set at the beginning of a new query group.
+   * @throws {Error} If QueryEvent.ebModel is not set.
    */
   constructor(
     name: string,
@@ -47,13 +92,14 @@ export class QueryEvent extends BaseEvent {
     QueryEvent.ebModel?.addEvent(this);
   }
 
-  /**
-   * 获取CRC参数
-   * @param {CrcOption} option - CRC选项
-   * @param {EBBuffer} ebBuffer - 缓冲区
-   * @returns {CrcPara} - 返回CRC参数
-   * @throws {Error} - 如果CRC(SUM)模式缺少CrcLen参数，抛出错误
-   * @throws {Error} - 如果placeIndex的索引范围超过128，抛出错误
+
+   /**
+   * Gets the CRC parameters.
+   * @param {CrcOption} option CrcOption.
+   * @param {EBBuffer} ebBuffer The buffer.
+   * @returns {CrcPara} The CRC parameters.
+   * @throws {Error} If CrcLen is missing for CRC(SUM) mode.
+   * @throws {Error} If the index range for placeIndex exceeds 128.
    */
   private getCrcPara(option: CrcOption, ebBuffer: EBBuffer): CrcPara {
     let buffer = ebBuffer.getBuffer();
@@ -131,31 +177,34 @@ export class QueryEvent extends BaseEvent {
     };
   }
 
-  /**
-   * 设置查询CRC参数
-   * @param {CrcOption} option - CRC选项
-   * @returns {QueryEvent} - 返回当前对象
+ 
+   /**
+   * Sets the query CRC parameters.
+   * @param {CrcOption} option CRC options.
+   * @returns {QueryEvent} The current object (for chaining).
    */
   setQueryCrc(option: CrcOption): QueryEvent {
     this.queryCrcPara = this.getCrcPara(option, this.cmdBuffer);
     return this;
   }
 
+ 
   /**
-   * 设置确认CRC参数
-   * @param {CrcOption} option - CRC选项
-   * @returns {QueryEvent} - 返回当前对象
+   * Sets the acknowledgment CRC parameters.
+   * @param {CrcOption} option CRC options.
+   * @returns {QueryEvent} The current object (for chaining).
    */
   setAckCrc(option: CrcOption): QueryEvent {
     this.ackCrcPara = this.getCrcPara(option, this.ackBuffer);
     return this;
   }
 
+ 
   /**
-   * 添加确认检查规则
-   * @param {number} index - 检查索引
-   * @param {number} verifyBytes - 验证字节
-   * @returns {QueryEvent} - 返回当前对象
+   * Adds an acknowledgment check rule.
+   * @param {number} index The check index.
+   * @param {number} verifyBytes The verification byte (single-byte check value in decimal).
+   * @returns {QueryEvent} this
    */
   addAckCheckRule(index: number, verifyBytes: number): QueryEvent {
     let tag: string = verifyBytes.toString(16).padStart(2, "0").toUpperCase();
@@ -180,6 +229,15 @@ export class QueryEvent extends BaseEvent {
    * @param {number} period - 周期值
    * @param {number} [offsetSecond] - 偏移秒数
    * @returns {this} - 返回当前对象
+   */
+
+  /**
+   * Sets the period.
+   * @param {number} period The period value.
+   * @param {number} offsetSecond The offset in seconds (optional). 
+   * - If provided, enables fixed-time acquisition with the specified offset;
+   * - if omitted, disables fixed-time acquisition.
+   * @returns The current object (for chaining).
    */
   setPeriod(period: number, offsetSecond?: number): this {
     super.setPeriod(period);

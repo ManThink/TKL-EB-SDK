@@ -1,10 +1,10 @@
 export interface OtaConfig {
   UpgradeOption: {
     /** 
-     * @description 升级方式
+     * @description Upgrade method
      * @example 
-     * - gw: 通过网关在线升级
-     * - sp: 通过串口方式升级
+     * - gw: Upgrade online via gateway
+     * - sp: Upgrade via serial port
      */
     UpgrdType: "gw" | "sp";
     AppEui: string;
@@ -17,7 +17,7 @@ export interface OtaConfig {
   AppPara: {
     FuotaVersion: number;
     /** 
-     * @description  硬件类型标识
+     * @description Hardware type identifier
      * @example 
      * - 40: om422   
      * - 51: om822 
@@ -33,32 +33,32 @@ export interface OtaConfig {
     WakeupOut: boolean;
     BackHaul: string;
     /** 
-     * 波特率
-     * @description 1200的整数倍 
+     * Baud rate
+     * @description Must be an integer multiple of 1200 
      * @example 1200
      * @example 112500
      */
     BaudRate: number;
     /** 
-     * @description 停止位 
+     * @description Stop bits 
      */
     StopBits: number;
     /** 
-     * @description 数据位
+     * @description Data bits
      */
     DataBits: number;
     /** 
-     * @description 校验位
+     * @description Check bit
      * @example 
-     * - none 无校验
-     * - even 偶校验
-     * - odd  奇校验
+     * - none No parity
+     * - even Even parity
+     * - odd  Odd parity
      */
     Checkbit: CheckbitEnum;
     TransparentBit: boolean;
     KeepRx: boolean;
     /** 
-     * @description 是否是电池供电
+     * @description Whether it is battery powered
      */
     Battery: boolean;
     Uart1Used: boolean;
@@ -105,7 +105,7 @@ export interface GetOtaConfigInput {
   
   Battery: OtaConfig["AppPara"]["Battery"];
   /** 
-   * @description LoRaWAN上行confirm包的占控比, 每多少包数据中发送一个confirm包
+   * @description The duty cycle of the LoRaWAN uplink confirmation packet, indicating how many data packets are sent before a confirmation packet is sent.
    */
   ConfirmDuty: OtaConfig["AppPara"]["ConfirmDuty"];
   BzType: number;
@@ -124,7 +124,7 @@ export interface GetOtaConfigInput {
   TransparentBit?: boolean;
   KeepRx?: boolean;
   /** 
-   * @description 是否是电池供电
+   * @description Whether it is battery powered
    */
   Uart1Used?: boolean;
   JoinRst?: boolean;
@@ -138,6 +138,12 @@ export interface GetOtaConfigInput {
   TimeOffset?: number;
 }
 
+/**
+ * @description Generates the OtaConfig object from the input configuration.
+ * @param otaConfig The input configuration for OTA.
+ * @returns The generated OtaConfig object.
+ * @throws An error if required fields are missing or BaudRate is invalid.
+ */
 export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
  
   if(!otaConfig.UpgrdType) {
@@ -210,4 +216,5 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
   }
 }
   
+
 

@@ -1,20 +1,20 @@
 /**
- * 表达式操作符输入类型，可以是字符串、数字或EBExpr对象
+ * Expression operator input type, which can be a string, number, or EBExpr object.
  */
 export type EBExprOperatorInput = string | number | EBExpr;
 
 /**
- * EBExpr类，用于构建和操作表达式
+ * EBExpr class, used to construct and manipulate expressions.
  */
 export class EBExpr {
-  protected optCout: number = 0; // 操作符计数
-  protected expr: string = ""; // 表达式字符串
-  protected readonly: boolean = false; // 是否只读
+  protected optCout: number = 0; // Operator count
+  protected expr: string = ""; // Expression string
+  protected readonly: boolean = false; // Whether the expression is read-only
 
   /**
-   * 构造函数
-   * @param {EBExprOperatorInput} v - 表达式初始值
-   * @param {boolean} [readonly=false] - 是否只读, 如果为只读数据
+   * Constructor
+   * @param v The initial value of the expression.
+   * @param readonly Whether the expression is read-only. Defaults to false.
    */
   constructor(v: EBExprOperatorInput, readonly: boolean = false) {
     this.expr = this.preCheck(v);
@@ -22,10 +22,10 @@ export class EBExpr {
   }
 
   /**
-   * 预检查表达式输入
-   * @param {EBExprOperatorInput} expr - 表达式输入
-   * @returns {string} - 返回处理后的表达式字符串
-   * @throws {Error} - 如果表达式只读或操作符超过6个，抛出错误
+   * Pre-checks the expression input.
+   * @param expr The expression input.
+   * @returns The processed expression string.
+   * @throws An error if the expression is read-only or the number of operators exceeds 6.
    */
   protected preCheck(expr: EBExprOperatorInput): string {
     if (this.readonly) {
@@ -45,17 +45,17 @@ export class EBExpr {
   }
 
   /**
-   * 获取当前表达式的值
-   * @returns {string} - 返回表达式字符串
+   * Gets the value of the current expression.
+   * @returns The expression string.
    */
   public getValue(): string {
     return this.expr;
   }
 
   /**
-   * 乘法操作
-   * @param {EBExprOperatorInput} num - 乘数
-   * @returns {EBExpr} - 返回当前对象
+   * Multiplication operation.
+   * @param num The multiplier.
+   * @returns The current object (for chaining).
    */
   multiply(num: EBExprOperatorInput) {
     this.expr = `${this.expr},*${this.preCheck(num)}`;
@@ -63,9 +63,9 @@ export class EBExpr {
   }
 
   /**
-   * 除法操作
-   * @param {EBExprOperatorInput} num - 除数
-   * @returns {EBExpr} - 返回当前对象
+   * Division operation.
+   * @param num The divisor.
+   * @returns The current object (for chaining).
    */
   divide(num: EBExprOperatorInput) {
     this.expr = `${this.expr},/${this.preCheck(num)}`;
@@ -73,9 +73,9 @@ export class EBExpr {
   }
 
   /**
-   * 加法操作
-   * @param {EBExprOperatorInput} num - 加数
-   * @returns {EBExpr} - 返回当前对象
+   * Addition operation.
+   * @param num The number to add.
+   * @returns The current object (for chaining).
    */
   add(num: EBExprOperatorInput) {
     this.expr = `${this.expr},+${this.preCheck(num)}`;
@@ -83,9 +83,9 @@ export class EBExpr {
   }
 
   /**
-   * 减法操作
-   * @param {EBExprOperatorInput} num - 减数
-   * @returns {EBExpr} - 返回当前对象
+   * Subtraction operation.
+   * @param num The number to subtract.
+   * @returns The current object (for chaining).
    */
   minus(num: EBExprOperatorInput) {
     this.expr = `${this.expr},-${this.preCheck(num)}`;
@@ -93,9 +93,9 @@ export class EBExpr {
   }
 
   /**
-   * 按位与操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Bitwise AND operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   bitwiseAnd(num: EBExprOperatorInput) {
     this.expr = `${this.expr},&${this.preCheck(num)}`;
@@ -103,9 +103,9 @@ export class EBExpr {
   }
 
   /**
-   * 幂运算操作
-   * @param {EBExprOperatorInput} num - 指数
-   * @returns {EBExpr} - 返回当前对象
+   * Power operation.
+   * @param num The exponent.
+   * @returns The current object (for chaining).
    */
   power(num: EBExprOperatorInput) {
     this.expr = `${this.expr},@${this.preCheck(num)}`;
@@ -113,9 +113,9 @@ export class EBExpr {
   }
 
   /**
-   * 按位取反操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Bitwise NOT operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   not(num: EBExprOperatorInput) {
     this.expr = `${this.expr},!${this.preCheck(num)}`;
@@ -123,9 +123,9 @@ export class EBExpr {
   }
 
   /**
-   * 左移操作
-   * @param {EBExprOperatorInput} num - 移动位数
-   * @returns {EBExpr} - 返回当前对象
+   * Left shift operation.
+   * @param num The number of bits to shift.
+   * @returns The current object (for chaining).
    */
   leftShift(num: EBExprOperatorInput) {
     this.expr = `${this.expr},<<${this.preCheck(num)}`;
@@ -133,9 +133,9 @@ export class EBExpr {
   }
 
   /**
-   * 右移操作
-   * @param {EBExprOperatorInput} num - 移动位数
-   * @returns {EBExpr} - 返回当前对象
+   * Right shift operation.
+   * @param num The number of bits to shift.
+   * @returns The current object (for chaining).
    */
   rightShift(num: EBExprOperatorInput) {
     this.expr = `${this.expr},>>${this.preCheck(num)}`;
@@ -143,9 +143,9 @@ export class EBExpr {
   }
 
   /**
-   * 按位或操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Bitwise OR operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   bitwiseOr(num: EBExprOperatorInput) {
     this.expr = `${this.expr},|${this.preCheck(num)}`;
@@ -153,9 +153,9 @@ export class EBExpr {
   }
 
   /**
-   * 不等于操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Not equal to operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   notEqual(num: EBExprOperatorInput) {
     this.expr = `${this.expr},!=${this.preCheck(num)}`;
@@ -163,9 +163,9 @@ export class EBExpr {
   }
 
   /**
-   * 等于操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Equal to operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   equal(num: EBExprOperatorInput) {
     this.expr = `${this.expr},==${this.preCheck(num)}`;
@@ -173,9 +173,9 @@ export class EBExpr {
   }
 
   /**
-   * 小于操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Less than operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   lessThan(num: EBExprOperatorInput) {
     this.expr = `${this.expr},<${this.preCheck(num)}`;
@@ -183,9 +183,9 @@ export class EBExpr {
   }
 
   /**
-   * 大于操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Greater than operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   greaterThan(num: EBExprOperatorInput) {
     this.expr = `${this.expr},>${this.preCheck(num)}`;
@@ -193,9 +193,9 @@ export class EBExpr {
   }
 
   /**
-   * 取模操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Modulo operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   mod(num: EBExprOperatorInput) {
     this.expr = `${this.expr},%${this.preCheck(num)}`;
@@ -203,9 +203,9 @@ export class EBExpr {
   }
 
   /**
-   * 按位异或操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Bitwise XOR operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   bitwiseXOR(num: EBExprOperatorInput) {
     this.expr = `${this.expr},^${this.preCheck(num)}`;
@@ -213,9 +213,9 @@ export class EBExpr {
   }
 
   /**
-   * 赋值操作
-   * @param {EBExprOperatorInput} num - 操作数
-   * @returns {EBExpr} - 返回当前对象
+   * Assignment operation.
+   * @param num The operand.
+   * @returns The current object (for chaining).
    */
   assign(num: EBExprOperatorInput) {
     this.expr = `${this.expr},=${this.preCheck(num)}`;
@@ -224,14 +224,14 @@ export class EBExpr {
 }
 
 /**
- * CopyData类，继承自EBExpr
+ * CopyData class, extends EBExpr. Used for copy operations.
  */
 export class CopyData extends EBExpr {
   private _name:string = "CopyData"
 }
 
 /**
- * CalcData类，继承自EBExpr
+ * CalcData class, extends EBExpr. Used for calculation operations.
  */
 export class CalcData extends EBExpr {
   private _name:string = "CalcData"

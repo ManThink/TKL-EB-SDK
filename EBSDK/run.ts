@@ -22,7 +22,6 @@ export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, M
 
   let interJson = MODBUS_TT(ebModel)
 
-  // 通过json文件生成bin文件, 
   let EBcompileInstance = new EBBinCompile(JSON.parse(interJson))
   let binBuffer = EBcompileInstance.compile().toBinFileContent()
 
@@ -43,19 +42,14 @@ export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, M
     mkdirSync(releasePath, { recursive: true });
     console.log(join(releasePath, `${fileName}.ota`));
 
-    // 生成升级包所需的ota文件
     writeFileSync(join(releasePath, `${fileName}.ota`), JSON.stringify(otaConfig));
 
-     // 生成过程中的json文件
     let outputPath = join(releasePath, `${fileName}.json`);
     writeFileSync(outputPath, interJson);
 
     writeFileSync(join(releasePath, `${fileName}.bin`), binBuffer);
 
     writeFileSync(join(releasePath, `${fileName}.obin`), obinString);
-    // 查询bin文件以及对应的同名ota文件进行bin文件的生成
-    // let outputBin = join(releasePath, `${fileName}.bin`);
-   
 
   }
 

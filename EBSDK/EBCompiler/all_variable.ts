@@ -1,3 +1,8 @@
+/**
+ * @file This file re-exports all essential modules and types from the EB-SDK compiler and configuration.
+ * It serves as a central entry point for the SDK's core components.
+ */
+
 export { BaseEvent} from "@EBSDK/EBCompiler/EBModel/Event/BaseEvent";
 export { LoraUpEvent } from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 export { QueryEvent } from "@EBSDK/EBCompiler/EBModel/Event/QueryEvent";

@@ -76,8 +76,8 @@ export enum UpEventType {
  * @property {string} DAY - 表示天。
  */
 export enum PeriodUnit {
-  SECOND = "s",
-  MINUTE = "m",
-  HOUR = "h",
-  DAY = "d"
+  SECOND = "s", // second
+  MINUTE = "m", // minute
+  HOUR = "h", // hour
+  DAY = "d" // day
 }

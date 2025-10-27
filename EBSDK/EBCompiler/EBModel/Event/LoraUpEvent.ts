@@ -5,24 +5,35 @@ import { BaseEvent } from "./BaseEvent";
 import { Buffer } from "buffer";
 
 /**
- * LoraUpEvent类，用于表示LoRa上行事件
+ * LoraUpEvent class, used to represent a LoRa uplink event.
  */
 export class LoraUpEvent extends BaseEvent {
-  static ebModel: EBModel | null = null; // 静态属性，用于存储EBModel实例
-
-  public readonly txBuffer: EBBuffer; // 发送缓冲区
-  public index!: number; // 事件索引
-  public txPort: number; // 发送端口
-  private type: UpEventType; // 事件类型
+    /** Static property to store the EBModel instance. */
+  static ebModel: EBModel | null = null; 
 
   /**
-   * 构造函数
-   * @param {string} name - 事件名称
-   * @param {Object} options - 事件配置
-   * @param {Buffer} options.txBuffer - 发送缓冲区
-   * @param {number} options.txPort - 发送端口
-   * @param {UpEventType} [options.type=UpEventType.NORMAL] - 事件类型，默认为NORMAL
-   * @throws {Error} - 如果未设置LoRaUpEvent.ebModel，抛出错误
+   * Transmit data buffer.
+   */
+  public readonly txBuffer: EBBuffer; 
+  /**
+ * The index of the event in the EBModel instance.
+ */
+  public index!: number; 
+  /** The transmission port. */
+  public txPort: number; 
+
+  /** The event type. */
+  private type: UpEventType; 
+
+
+  /**
+   * Constructor
+   * @param {string} name The name of the event.
+   * @param {Object} options Event configuration.
+   * @param {Buffer} options.txBuffer The transmission buffer.
+   * @param {number} options.txPort The transmission port.
+   * @param {UpEventType} [options.type=UpEventType.NORMAL] The event type, defaults to UpEventType.NORMAL.
+   * @throws {Error} If LoraUpEvent.ebModel is not set.
    */
   constructor(
     name: string,
@@ -50,8 +61,8 @@ export class LoraUpEvent extends BaseEvent {
   }
 
   /**
-   * 将事件对象转换为JSON格式
-   * @returns {Object} - 返回包含事件属性的JSON对象
+   * Converts the event object to JSON format.
+   * @returns A JSON object containing the event properties.
    */
   toJSON() {
     return {
