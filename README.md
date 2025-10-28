@@ -1,3 +1,2 @@
-《EB-compiler 编译使用说明》 https://mensikeji.yuque.com/staff-zesscp/gqdw7f/trz8i5b7iddrug10?singleDoc# 
-ThinkLink 平台：https://thinklink.manthink.cn
-test
+EB compiler SDK instructions : https://mensikeji.yuque.com/staff-zesscp/gqdw7f/sw2h63yynws3vcn0?singleDoc#
+EdgeBus App Parameter Manual : https://mensikeji.yuque.com/staff-zesscp/gqdw7f/wi7zpgc14t6cfl9g?singleDoc# 
