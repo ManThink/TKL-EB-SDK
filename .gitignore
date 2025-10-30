@@ -1,6 +1,6 @@
 node_modules
 .vscode
-
+.idea
 # /project/test*
 /project/*/release
 /project/test*/**
