@@ -10,7 +10,7 @@ class JS_ConstString {
     static UpType = ["normal", "1", "2"];
     static UpCond = ["none", "1", "2"];
     static QueryCond = ["none", "1", "2"];
-    static IFList = ["uart1", "uart2", "spi", "i2c", "gpio", "ad"];
+    static IFList = ["uart1", "uart2", "spi", "i2c", "gpio", "ad", "no_query"];
     static OvenList = ["none", "odd", "even"];
 
     // 私有静态方法

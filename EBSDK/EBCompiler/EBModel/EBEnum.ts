@@ -1,10 +1,10 @@
 /**
  * @enum {string}
- * @description 计算赋值动作<CvtRule>执行完成后需要要执行的动作类型枚举
- * @property {string} NONE - 无动作
- * @property {string} UP - 直接上传
- * @property {string} UP_TO_RESULT - 根据前面的赋值对象决定是否上传, 该上传对象中只要有CvtRule后的结果>0 才上传
- * @property {string} ALWAYS_REBOOT - 查询后无条件重启
+ * @description Enumeration of action types to be executed after the <CvtRule> calculation/assignment action is completed.
+ * @property {string} NONE - No action.
+ * @property {string} ALWAYS - Upload directly.
+ * @property {string} UP_TO_RESULT - Upload based on the result of the assignment object; upload only if the result of CvtRule is > 0.
+ * @property {string} ALWAYS_REBOOT - Unconditionally reboot after a query.
  */
 export enum ActionAfertExpr {
   NONE = "none",
@@ -15,10 +15,10 @@ export enum ActionAfertExpr {
 
 /**
  * @enum {string}
- * @description 检验算法
- * @property {string} CRC16 - CRC16校验
- * @property {string} CCITT16 - CCITT16校验
- * @property {string} SUM - 求和校验
+ * @description Checksum algorithm.
+ * @property {string} CRC16 - CRC16 checksum.
+ * @property {string} CCITT16 - CCITT16 checksum.
+ * @property {string} SUM - Sum checksum.
  */
 export enum CrcMode {
   CRC16 = "crc16",
@@ -28,40 +28,39 @@ export enum CrcMode {
 
 /**
  * @enum {string}
- * @description 事件中动作的执行条件 
- * - 如果当前事件为 QueryEvent, 则判断对象为当前查询事件的执行结果
- * - 如果当前事件为 UpEvent, 则判断对象为最近一次查询事件的执行结果
- * @property {string} NONE - 无条件执行
- * @property {string} ONTIME  - 未超时时执行
- * @property {string} TIMEOUT - 超时时执行
+ * @description Execution condition for actions within an event.
+ * - If the current event is QueryEvent, the condition is based on the execution result of the current query event.
+ * - If the current event is UpEvent, the condition is based on the execution result of the most recent query event.
+ * @property {string} NONE - Execute unconditionally.
+ * @property {string} ONTIME - Execute when not timed out.
+ * @property {string} TIMEOUT - Execute when timed out.
  */
 export enum ExprCondition {
-  /** 无论查询事件结果是什么都无条件执行该动作 */
+  /** Execute the action unconditionally, regardless of the query event result. */
   NONE = "none",      
-  /** 最近一次执行的查询事件未超时时执行  */    
+  /** Execute when the most recently executed query event did not time out. */    
   ONTIME = "ontime",   
-  /** 最近一次执行的查询事件超时时执行  */
+  /** Execute when the most recently executed query event timed out. */
   TIMEOUT = "timeout" 
 }
 
 /**
  * @enum {string}
- * @description CRC校验码存放的位置枚举。
- * @property {string} LEFT - 表示CRC校验码存放在左侧。
- * @property {string} RIGHT - 表示CRC校验码存放在右侧。
+ * @description Position of the CRC checksum code.
+ * @property {string} LEFT - The CRC checksum code is placed on the left.
+ * @property {string} RIGHT - The CRC checksum code is placed on the right.
  */
-
 export enum CrcPosition {
-  /** CRC校验码存放在左侧 */
+  /** CRC checksum code is placed on the left. */
   LEFT = "left",
-  /** CRC校验码存放在右侧 */
+  /** CRC checksum code is placed on the right. */
   RIGHT = "right"
 }
 
 /**
  * @enum {string}
- * @description LoraUpEvent 上行事件类型枚举。
- * @property {string} NORMAL - 表示普通上行事件。
+ * @description Type of LoRaUpEvent uplink event.
+ * @property {string} NORMAL - Represents a normal uplink event.
  */
 export enum UpEventType {
   NORMAL = "normal"
@@ -69,15 +68,26 @@ export enum UpEventType {
 
 /**
  * @enum {string}
- * @description 周期单位枚举。
- * @property {string} SECOND - 表示秒。
- * @property {string} MINUTE - 表示分钟。
- * @property {string} HOUR - 表示小时。
- * @property {string} DAY - 表示天。
+ * @description Enumeration of period units.
+ * @property {string} SECOND - Second.
+ * @property {string} MINUTE - Minute.
+ * @property {string} HOUR - Hour.
+ * @property {string} DAY - Day.
  */
 export enum PeriodUnit {
   SECOND = "s", // second
   MINUTE = "m", // minute
   HOUR = "h", // hour
   DAY = "d" // day
+}
+
+/**
+ * @enum {string}
+ * @description Enumeration for selecting the query interface.
+ * @property {string} uart2 - Use UART2 for querying.
+ * @property {string} no_query - Do not perform a query; proceed directly to subsequent operations.
+ */
+export enum IfSelectEnum {
+  uart2 = "uart2",
+  no_query = "no_query" 
 }

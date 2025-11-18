@@ -1,7 +1,7 @@
 import { EBBuffer } from "../EBBuffer";
 import { EBModel } from "../EBModel";
 import { CopyRule, CvtRule } from "../EBRule";
-import { CrcMode, CrcPosition } from "../EBEnum";
+import { CrcMode, CrcPosition, IfSelectEnum } from "../EBEnum";
 import { CrcOption, CrcPara, PeriodValue, TagCheckProp } from "../interface";
 import { BaseEvent } from "./BaseEvent";
 import { Buffer } from "buffer";
@@ -38,6 +38,15 @@ export class QueryEvent extends BaseEvent {
 
 
   /**
+ * @enum {string}
+ * @default {string} uart2
+ * @description Enumeration for selecting the query interface.
+ * @property {string} uart2 - Use UART2 for querying.
+ * @property {string} no_query - Do not perform a query; proceed directly to subsequent operations.
+ */
+  protected ifSelect: IfSelectEnum;
+
+  /**
    * Whether to enable fixed-time acquisition.
    * If true, data is collected at regular time intervals based on the query cycle.
    */
@@ -54,17 +63,6 @@ export class QueryEvent extends BaseEvent {
    */
   protected MulDev_NewGrpStart: boolean; 
 
-  /**
-   * 构造函数
-   * @param {string} name - 事件名称
-   * @param {Object} options - 事件配置
-   * @param {Buffer} options.ackBuffer - 485设备返回的数据的缓存区
-   * @param {Buffer} options.cmdBuffer - 下发给485设备的查询命令缓存区
-   * @param {boolean} options.MulDev_NewGrpStart - 一带多DTU查询指令的分组起始位置标识.
-   *  - 开启此标识后，DTU支持一带多设备通信
-   *  - 仅需在新的查询分组开始时需要设置此标志位
-   * @throws {Error} - 如果未设置QueryEvent.ebModel，抛出错误
-   */
    /**
    * Constructor
    * @param {string} name The name of the event.
@@ -199,6 +197,11 @@ export class QueryEvent extends BaseEvent {
     return this;
   }
 
+
+
+  setIfSelect(nextIfSelect:IfSelectEnum ) {
+    this.ifSelect = nextIfSelect;
+  }
  
   /**
    * Adds an acknowledgment check rule.
@@ -248,8 +251,8 @@ export class QueryEvent extends BaseEvent {
   toJSON() {
 
     return {
-      
       ...super.toJSON(),
+      ifSelect: this.ifSelect,
       MulDev_NewGrpStart: this.MulDev_NewGrpStart,
       queryPeriod: this.queryPeriod,
       ackBuffer: this.ackBuffer,
