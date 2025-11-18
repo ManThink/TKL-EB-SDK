@@ -44,7 +44,7 @@ export class QueryEvent extends BaseEvent {
  * @property {string} uart2 - Use UART2 for querying.
  * @property {string} no_query - Do not perform a query; proceed directly to subsequent operations.
  */
-  protected ifSelect: IfSelectEnum;
+  protected ifSelect?: IfSelectEnum;
 
   /**
    * Whether to enable fixed-time acquisition.
