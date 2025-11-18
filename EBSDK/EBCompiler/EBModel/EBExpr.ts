@@ -221,6 +221,21 @@ export class EBExpr {
     this.expr = `${this.expr},=${this.preCheck(num)}`;
     return this;
   }
+
+  /**
+   * Absolute value operation.
+   * Returns the absolute value of the current expression.
+   * @returns The current object (for chaining).
+   */
+  absolute() {
+     this.expr = `${this.expr},__abs__`;
+    return this;
+  }
+
+  /**
+   * 
+   */
+
 }
 
 /**

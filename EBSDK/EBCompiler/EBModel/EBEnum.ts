@@ -41,7 +41,12 @@ export enum ExprCondition {
   /** Execute when the most recently executed query event did not time out. */    
   ONTIME = "ontime",   
   /** Execute when the most recently executed query event timed out. */
-  TIMEOUT = "timeout" 
+  TIMEOUT = "timeout",
+  /** 
+   * Execute before the query event. 
+   * Only used in query events, executed prior to the actual query operation.
+  */
+  PRE = "pre"
 }
 
 /**
@@ -88,6 +93,6 @@ export enum PeriodUnit {
  * @property {string} no_query - Do not perform a query; proceed directly to subsequent operations.
  */
 export enum IfSelectEnum {
-  uart2 = "uart2",
-  no_query = "no_query" 
+  UART2 = "uart2",
+  NO_QUERY = "no_query" 
 }
