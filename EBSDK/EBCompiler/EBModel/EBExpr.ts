@@ -228,7 +228,7 @@ export class EBExpr {
    * @returns The current object (for chaining).
    */
   absolute() {
-     this.expr = `${this.expr},__abs__`;
+     this.expr = `${this.expr},__abs__0`;
     return this;
   }
 
