@@ -3,7 +3,7 @@ class JS_ConstString {
     static ActionList = ["none", "up", "upr", "rmsrc", "rmdes", "rst"];
     static DataTypeList = ["uint", "int", "float", "bcd", "double", "asc", "xaf", "xaasc"];
     static CvtBuffer = ["ack", "resv1", "table", "temp", "fw", "rd", "cf", "app", "ds", "quhdr", "uphdr", "cond", "appsts", "sensor", "resv2", "resv3"];
-    static OpStr = ["*", "/", "+", "-", "&", "|", "@", "!", "<<", ">>", "s", "!=", "==", "<", ">", "in", "out", "dic", "%", "^", "!^", "=", "__abs__"];
+    static OpStr = ["*", "/", "+", "-", "&", "|", "@", "!", "<<", ">>", "s", "!=", "==", "<", ">", "in", "out", "dic", "%", "^", "!^", "=", "|_|"];
     static Unit = ["s", "m", "h", "d"];
     static CrcMode = ["crc16", "ccitt16", "sum"];
     static CvtCond = ["none", "ontime", "timeout", "pre"];
