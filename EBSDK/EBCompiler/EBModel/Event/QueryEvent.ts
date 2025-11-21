@@ -5,6 +5,7 @@ import { CrcMode, CrcPosition, IfSelectEnum } from "../EBEnum";
 import { CrcOption, CrcPara, PeriodValue, TagCheckProp } from "../interface";
 import { BaseEvent } from "./BaseEvent";
 import { Buffer } from "buffer";
+import { LoraUpEvent } from "./LoraUpEvent";
 
 /**
  * QueryEvent class, used to represent a query event.
@@ -85,7 +86,7 @@ export class QueryEvent extends BaseEvent {
     }
     super(name);
     this.ackBuffer = new EBBuffer(`ack`, ackBuffer);
-    this.cmdBuffer = new EBBuffer(`qu`, cmdBuffer);
+    this.cmdBuffer = new EBBuffer(`qu[${LoraUpEvent.ebModel?.getLoraUpEventCount()}]`, cmdBuffer);
     this.MulDev_NewGrpStart = !!MulDev_NewGrpStart;
     QueryEvent.ebModel?.addEvent(this);
   }

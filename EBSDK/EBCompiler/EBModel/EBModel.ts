@@ -62,6 +62,10 @@ export class EBModel {
     return this.LoraUpEventList.length;
   }
 
+  getQueryEventCount(): number {
+    return this.QueryEventList.length;
+  }
+
   /**
    * Adds an event to the event list.
    * @param event The event to add, which can be a LoRa uplink event(LoraUpEvent) or a query event(QueryEvent).
