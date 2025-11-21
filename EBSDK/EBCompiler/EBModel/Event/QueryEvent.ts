@@ -86,7 +86,7 @@ export class QueryEvent extends BaseEvent {
     }
     super(name);
     this.ackBuffer = new EBBuffer(`ack`, ackBuffer);
-    this.cmdBuffer = new EBBuffer(`qu[${LoraUpEvent.ebModel?.getLoraUpEventCount()}]`, cmdBuffer);
+    this.cmdBuffer = new EBBuffer(`qu[${LoraUpEvent.ebModel?.getQueryEventCount()}]`, cmdBuffer);
     this.MulDev_NewGrpStart = !!MulDev_NewGrpStart;
     QueryEvent.ebModel?.addEvent(this);
   }
