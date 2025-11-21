@@ -38,9 +38,8 @@ class MT_QueryTmplt {
         // QueryCrc_CalcIdx 和 AckCrc_CalcIdx
         lstBytes=Utility.bufferPush(lstBytes,
             (this.QueryCrc_CalcIdx & 0x0F) |
-            (this.AckCrc_CalcIdx << 4)
+            (this.AckCrc_CalcIdx << 4 & 0xF0)
         );
-
         // 第一个 Endian 字节
         lstBytes=Utility.bufferPush(lstBytes,
             (this.QueryCrc_LEndian ? 0 : 1) |

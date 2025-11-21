@@ -56,7 +56,10 @@ export interface OtaConfig {
      */
     Checkbit: CheckbitEnum;
     TransparentBit: boolean;
-    KeepRx: boolean;
+    /**
+     * @description After the query event is executed, the data received from the serial port is directly passed through without processing.
+     */
+    UpRawAfterQuery: boolean;
     /** 
      * @description Whether it is battery powered
      */
@@ -122,7 +125,10 @@ export interface GetOtaConfigInput {
   BackHaul?: string;
 
   TransparentBit?: boolean;
-  KeepRx?: boolean;
+  /**
+   * @description After the query event is executed, the data received from the serial port is directly passed through without processing.
+   */
+  UpRawAfterQuery?: boolean;
   /** 
    * @description Whether it is battery powered
    */
@@ -198,7 +204,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
       // "DataBits": DataBits,
       // "Checkbit": Checkbit,
       "TransparentBit": false,
-      "KeepRx": false,
+      "UpRawAfterQuery": false,
       // "Battery":Battery,
       "Uart1Used": false,
       "JoinRst": false,
