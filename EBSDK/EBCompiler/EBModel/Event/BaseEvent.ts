@@ -24,7 +24,7 @@ export class BaseEvent {
   /**
    * The maximum period value for the event cycle. Units can be seconds, minutes, hours, or days.
    */
-  private maxPeriodValue = 0x3FFF;  // 16383
+  private maxPeriodValue = 0x3FFF;  
 
   /**
    * @param name The name of the event.
@@ -79,6 +79,9 @@ export class BaseEvent {
     } else if (period < this.maxPeriodValue * 60 * 60 * 24) {
       unit = PeriodUnit.DAY;
       periodValue = Math.floor(period / 60 / 60 / 24);
+      if (periodValue > 0x3000) {
+        throw new Error("The maximum period time is 12288 days.")
+      }
     } else {
       throw new Error("period is out of range");
     }
@@ -87,6 +90,21 @@ export class BaseEvent {
     this.queryPeriod.unit = unit;
     
     return this;
+  }
+
+  /**
+ * Configures the period using a register address mapping.
+ * 
+ * @param unit8_addr - Register address (0x00-0xC7) for period configuration
+ * @returns Current instance for chaining
+ */
+  setPeriodFromApp(unit8_addr:number) {
+    if (unit8_addr > 0xc7 || unit8_addr < 0) {
+      throw new Error(`Invalid address: 0x${unit8_addr.toString(16).toUpperCase()}. Valid address range: 0x00 - 0xC7`);
+    }  
+    this.queryPeriod.periodValue = unit8_addr + 0x3000;
+    this.queryPeriod.unit = PeriodUnit.DAY;
+    return this
   }
 
   /**

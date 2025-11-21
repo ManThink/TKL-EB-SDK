@@ -78,12 +78,13 @@ export enum UpEventType {
  * @property {string} MINUTE - Minute.
  * @property {string} HOUR - Hour.
  * @property {string} DAY - Day.
+ * @property {string} DAY - .
  */
 export enum PeriodUnit {
   SECOND = "s", // second
   MINUTE = "m", // minute
   HOUR = "h", // hour
-  DAY = "d" // day
+  DAY = "d", // day
 }
 
 /**

@@ -16,7 +16,7 @@ export class QueryEvent extends BaseEvent {
   /**
    * Buffer for downstream meter reading commands.
    */
-  public cmdBuffer: EBBuffer = new EBBuffer("cmd", Buffer.alloc(0));
+  public cmdBuffer: EBBuffer = new EBBuffer("qu", Buffer.alloc(0));
 
   /**
    * Buffer for device response messages.
@@ -85,7 +85,7 @@ export class QueryEvent extends BaseEvent {
     }
     super(name);
     this.ackBuffer = new EBBuffer(`ack`, ackBuffer);
-    this.cmdBuffer = new EBBuffer(`cmd`, cmdBuffer);
+    this.cmdBuffer = new EBBuffer(`qu`, cmdBuffer);
     this.MulDev_NewGrpStart = !!MulDev_NewGrpStart;
     QueryEvent.ebModel?.addEvent(this);
   }
