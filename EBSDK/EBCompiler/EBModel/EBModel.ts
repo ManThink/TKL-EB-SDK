@@ -43,9 +43,44 @@ export class ALL_VARIABLE {
  * Provides functionality to add events, get the event count, and generate JSON-formatted data.
  */
 export class EBModel {
+
   /**
-   * List of LoRa uplink events
+   * build-in buffer static member
    */
+  /**
+   * build-in buffer => new EBBuffer("app", Buffer.alloc(255));
+   */
+  APP = new EBBuffer("app", Buffer.alloc(255));
+  /**
+   * build-in buffer => new EBBuffer("appsts", Buffer.alloc(32));
+   */
+  APP_STATUS = new EBBuffer("appsts", Buffer.alloc(32));
+  /**
+   * build-in buffer => new EBBuffer("sensor", Buffer.alloc(128));
+   */
+  SENSOR_DATA = new EBBuffer("sensor", Buffer.alloc(128));
+  /**
+   * build-in buffer => new EBBuffer("temp", Buffer.alloc(128));
+   */
+  TEMPLATE = new EBBuffer("temp", Buffer.alloc(128));
+  /**
+   * build-in buffer => new EBBuffer("ds", Buffer.alloc(16));
+   */
+  DEVICE_STATUS = new EBBuffer("ds", Buffer.alloc(16));
+
+  /**
+   * The current writing offset within the `SENSOR_DATA` buffer, used
+   * exclusively for Change of Value (COV) calculations. This ensures
+   * that multiple COV checks write to distinct memory locations.
+   */
+  public sensorDataBufferOffset = 0;
+  /**
+   * The current writing offset within the `TEMPLATE` buffer, used
+   * exclusively for Change of Value (COV) calculations. This tracks
+   * space for intermediate values like differences and comparison results.
+  */
+  public templateBufferOffset = 0;
+
   private LoraUpEventList: Array<LoraUpEvent> = []; 
   /** 
    * List of query events

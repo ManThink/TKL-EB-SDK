@@ -24,11 +24,11 @@ let otaConfig = getOtaConfig({
     BzVersion: 2 // required,1 bytes
 })
 const MODBUS_TT = (ebModel: EBModel) => {
-    const APP = new EBBuffer("app", Buffer.alloc(255));
-    const APP_STATUS = new EBBuffer("appsts", Buffer.alloc(32));
-    const SENSOR_DATA = new EBBuffer("sensor", Buffer.alloc(128));
-    const TEMPLATE = new EBBuffer("temp", Buffer.alloc(128));
-    const DEVICE_STATUS = new EBBuffer("ds", Buffer.alloc(16));
+    const APP = ebModel.APP;
+    const APP_STATUS = ebModel.APP_STATUS;
+    const SENSOR_DATA = ebModel.SENSOR_DATA;
+    const TEMPLATE = ebModel.TEMPLATE;
+    const DEVICE_STATUS = ebModel.DEVICE_STATUS;
 ///////////////////////////////////////////////////////////////////////////////
     
     // the Buffer which will be transmitted to sub device by UART/RS-485/M-Bus
@@ -111,3 +111,7 @@ const MODBUS_TT = (ebModel: EBModel) => {
     return JSON.stringify(ebModel, null, 2)
 }
 buildOtaFile(__filename, otaConfig, MODBUS_TT)
+
+
+
+

@@ -1,7 +1,7 @@
 import { EBBuffer } from "../EBBuffer";
 import { EBModel } from "../EBModel";
 import { CopyRule, CvtRule } from "../EBRule";
-import { CrcMode, CrcPosition, IfSelectEnum } from "../EBEnum";
+import { ActionAfertExpr, CrcMode, CrcPosition, ExprCondition, IfSelectEnum } from "../EBEnum";
 import { CrcOption, CrcPara, PeriodValue, TagCheckProp } from "../interface";
 import { BaseEvent } from "./BaseEvent";
 import { Buffer } from "buffer";
@@ -248,6 +248,77 @@ export class QueryEvent extends BaseEvent {
     }
     return this;
   }
+  
+  /**
+   * Sets up a "Change of Value" (COV) detection rule.
+   *
+   * Configures COV (Change of Value) detection for query events: triggers the provided uplink event 
+   * immediately for data reporting when the difference between response data and previous value 
+   * exceeds the configured threshold
+   * through a series of Event Bus operations (pushEBData). It performs the following steps:
+   * 1. Reads a new value from the device's acknowledgment frame (`ackBuffer`) and stores it in the `SENSOR_DATA` buffer.
+   * 2. Calculates the absolute difference between this new value and the previously reported value.
+   * 3. Compares this difference against a threshold defined in the `APP` buffer.
+   * 4. If the difference exceeds the threshold, it writes a non-zero result to a specified location in the `txBuffer` and configures this action to trigger a LoRaWAN uplink.
+   * 5. Automatically increments the global `sensorDataBufferOffset` based on the data type, preparing it for the next COV check.
+   *
+   * @param {object} options - Configuration options for the COV detection rule.
+   * @param {number} options.ackBufferIndex - The starting index in `ackBuffer` from which to read the new sensor value.
+   * @param {object} options.up - Configuration related to the uplink data.
+   * @param {LoraUpEvent} options.up.event - The uplink event object, used to access the `txBuffer`.
+   * @param {number} options.up.txBufferIndex - The starting index of the "last reported value" stored in the `txBuffer`.
+   * @param {number} options.appBufferCovThresholdIndex - The starting index of the COV threshold value stored in the `APP` buffer.
+   * @param {number} options.txCovResultIndex - The index in `txBuffer` where the COV comparison result (0 or 1) will be stored. This result determines whether to trigger an uplink.
+   * @param {"Uint8" | "Int8" | "Int16BE" | ...} options.binaryDataType - The binary type of the data being processed. This determines which read/write functions to use (e.g., `readInt16BE`) and the number of bytes the data occupies.
+   *
+   * @returns {number} The starting `sensorDataBufferOffset` value used for this operation. The caller can use this return value to reference the data that was just written to the `SENSOR_DATA` area.
+   */
+  setupCov(
+    {
+      ackBufferIndex, up, appBufferCovThresholdIndex, txCovResultIndex, binaryDataType
+    }: {
+      ackBufferIndex: number,
+      up: {
+          event: LoraUpEvent,
+          txBufferIndex: number;
+      },
+      appBufferCovThresholdIndex:number,
+      txCovResultIndex:number,
+      binaryDataType: "Uint8" | "Int8" | "Int16BE" | "Int16LE" | "Uint16BE" | "Uint16LE"  | "Int32BE" | "Int32LE" | "Uint32BE" | "Uint32LE" 
+    }
+    
+  ):number {
+    let sensorDataBufferOffset =  QueryEvent.ebModel.sensorDataBufferOffset;
+    let writeFun = `write${binaryDataType}`;
+    let readFun = `read${binaryDataType}`
+    this.pushEBData(
+      QueryEvent.ebModel.SENSOR_DATA[writeFun]( this.ackBuffer[readFun](ackBufferIndex), sensorDataBufferOffset),{condition: ExprCondition.ONTIME}
+    )
+    this.pushEBData(
+      up.event.txBuffer.writeUint8( 
+        up.event.txBuffer[readFun](up.txBufferIndex)
+          .minus(QueryEvent.ebModel.SENSOR_DATA[readFun](sensorDataBufferOffset))
+          .absolute()
+          .greaterThan(QueryEvent.ebModel.APP[readFun](appBufferCovThresholdIndex)),
+        txCovResultIndex
+      ), 
+      {
+          condition: ExprCondition.ONTIME, 
+          ActAfterCvt:ActionAfertExpr.UP_TO_RESULT 
+      }
+    )
+    if(["Uint8" , "Int8"].includes(binaryDataType)) {
+      QueryEvent.ebModel.sensorDataBufferOffset += 1
+    } else if (["Int16BE", "Int16LE", "Uint16BE", "Uint16LE" ].includes(binaryDataType)) {
+      QueryEvent.ebModel.sensorDataBufferOffset += 2
+    } else if (["Int32BE", "Int32LE", "Uint32BE", "Uint32LE" ].includes(binaryDataType))  {
+      return QueryEvent.ebModel.sensorDataBufferOffset += 4
+    }
+
+    return sensorDataBufferOffset
+  }
+
+
 
   toJSON() {
 
