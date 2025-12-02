@@ -14,6 +14,9 @@ export class QueryEvent extends BaseEvent {
   /** Static property to store the EBModel instance. */
   static ebModel: EBModel | null = null; 
 
+  private UpAfterQuery: boolean = false; 
+  private UpAfterQueryEventIdx: number = 0;
+
   /**
    * Buffer for downstream meter reading commands.
    */
@@ -75,6 +78,9 @@ export class QueryEvent extends BaseEvent {
    *  - This flag only needs to be set at the beginning of a new query group.
    * @throws {Error} If QueryEvent.ebModel is not set.
    */
+
+  
+   
   constructor(
     name: string,
     { ackBuffer, cmdBuffer, MulDev_NewGrpStart=false }: { ackBuffer: Buffer; cmdBuffer: Buffer; MulDev_NewGrpStart?:boolean}
@@ -319,10 +325,16 @@ export class QueryEvent extends BaseEvent {
   }
 
 
+  _setUpAfterQuery(upEvent:LoraUpEvent) {
+    this.UpAfterQuery = true;
+    this.UpAfterQueryEventIdx = upEvent.index;
+  }
+
+  
+  
 
   toJSON() {
-
-    return {
+    let data:any = {
       ...super.toJSON(),
       ifSelect: this.ifSelect,
       MulDev_NewGrpStart: this.MulDev_NewGrpStart,
@@ -334,6 +346,13 @@ export class QueryEvent extends BaseEvent {
       queryCrcPara: this.queryCrcPara,
       caculist: this.caculist,
       copyList: this.copyList
-    };
+    }
+
+    if (this.UpAfterQuery) {
+      data.UpAfterQuery = this.UpAfterQuery;
+      data.UpAfterQueryEventIdx = this.UpAfterQueryEventIdx;
+    }
+     
+    return data
   }
 }

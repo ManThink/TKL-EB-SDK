@@ -5,7 +5,9 @@ class MT_QueryPara {
     constructor(data={}) {
         this.QueryPeriod = data.QueryPeriod ?? new MT_Period();
         this.QueryTmpltIdx = data.QueryTmpltIdx ?? 0;
-        this.MulDev_GroupOver =data.MulDev_GroupOver ?? false;
+        this.MulDev_GroupOver = data.MulDev_GroupOver ?? false;
+        this.UpAfterQuery = data.UpAfterQuery ?? false;
+        this.UpAfterQueryEventIdx = data.UpAfterQueryEventIdx ?? 0;
         this.Resv = data.Resv ?? 0;
     }
     // 转换为字节数组
@@ -35,8 +37,14 @@ class MT_QueryPara {
             (this.MulDev_GroupOver ? 0x80 : 0)
         );
 
+        lstBytes = Utility.bufferPush(lstBytes, 
+            ( this.UpAfterQuery ? 0x01 : 0x00 ) |
+            ( this.UpAfterQueryEventIdx << 1 & 0x3E) |
+            ( this.Resv << 6 & 0xC0)
+        )
+
         // 添加 Resv
-        lstBytes=Utility.bufferPush(lstBytes,this.Resv);
+        // lstBytes=Utility.bufferPush(lstBytes,this.Resv);
 
         return Buffer.from(lstBytes);
     }

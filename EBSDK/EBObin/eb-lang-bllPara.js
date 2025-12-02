@@ -118,7 +118,7 @@ class MT_BllPara {
         for( i=0;i<this.lstUpTmplt.length;i++){
             const val=this.lstUpTmplt[i]
             if(!(val instanceof  MT_UpTmplt)) continue
-            if (val.equals(obj)) return i
+            // if (val.equals(obj)) return i
         }
         this.lstUpTmplt.push(obj)
         return i

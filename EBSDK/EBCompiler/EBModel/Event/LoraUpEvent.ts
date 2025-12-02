@@ -53,8 +53,8 @@ export class LoraUpEvent extends BaseEvent {
       );
     }
     super(name);
-    let index = LoraUpEvent.ebModel?.getLoraUpEventCount();
-    this.txBuffer = new EBBuffer(`up[${index}]`, txBuffer);
+    this.index = LoraUpEvent.ebModel?.getLoraUpEventCount();
+    this.txBuffer = new EBBuffer(`up[${this.index}]`, txBuffer);
     this.txPort = txPort;
     this.type = type;
     LoraUpEvent.ebModel?.addEvent(this);

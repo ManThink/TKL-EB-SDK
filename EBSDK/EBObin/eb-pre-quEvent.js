@@ -37,6 +37,9 @@ class MT_quEvent  {
 
         this.MulDev_NewGrpStart = data.MulDev_NewGrpStart|| false;
 
+        this.UpAfterQuery = data.UpAfterQuery || false; 
+        this.UpAfterQueryEventIdx = data.UpAfterQueryEventIdx || 0;
+
         // 初始化为 null 或空数组
         this.queryCrcPara = data.queryCrcPara ? MT_CrcPara.fromJSON(data.queryCrcPara) : null;
 
@@ -90,7 +93,9 @@ class MT_quEvent  {
                 {
                     QueryPeriod:this.queryPeriod,
                     QueryTmpltIdx:QueryTmpltIdx,
-                    MulDev_GroupOver:this.MulDev_NewGrpStart
+                    MulDev_GroupOver:this.MulDev_NewGrpStart,
+                    UpAfterQuery: this.UpAfterQuery,
+                    UpAfterQueryEventIdx: this.UpAfterQueryEventIdx
                 }
             );
 
