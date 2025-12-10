@@ -21,7 +21,8 @@ let otaConfig = getOtaConfig({
     Battery: true,
     ConfirmDuty: 60,
     BzType: 101, // required ,2 bytes
-    BzVersion: 2 // required,1 bytes
+    BzVersion: 2, // required,1 bytes
+    SwVersion: 31
 })
 const MODBUS_TT = (ebModel: EBModel) => {
     const APP = ebModel.APP;

@@ -65,17 +65,19 @@ class MT_BllFuotaPackets {
             }
 
             if (len > this.BLOCK_SIZE - this.CRC_SIZE) {
-                lstBytes = lstBytes.concat(data.slice(this.CRC_SIZE, this.BLOCK_SIZE));
+                lstBytes.push(...data.slice(this.CRC_SIZE, this.BLOCK_SIZE));
                 if (!this.checkBlock(data.slice(this.BLOCK_SIZE, 2048))) {
                     console.log("wrong crc of second block!");
                     return null;
                 }
-                lstBytes = lstBytes.concat(data.slice(this.BLOCK_SIZE + this.CRC_SIZE, len + this.CRC_SIZE));
+                let a = data.slice(this.BLOCK_SIZE + this.CRC_SIZE, len + this.CRC_SIZE);
+
+                lstBytes.push(...data.slice(this.BLOCK_SIZE + this.CRC_SIZE, len + 2 * this.CRC_SIZE)) 
             } else {
-                lstBytes = lstBytes.concat(data.slice(this.CRC_SIZE, len + this.CRC_SIZE));
+                lstBytes.push(...data.slice(this.CRC_SIZE, len + this.CRC_SIZE))
             }
 
-            if (!this.checkBin(lstBytes[0])) {//转为buffer
+            if (!this.checkBin(lstBytes)) {//转为buffer
                 console.log("wrong format of bin file");
                 return null;
             }
@@ -83,7 +85,7 @@ class MT_BllFuotaPackets {
             console.log("reading bin file failed: " + ex.toString());
             return null;
         }
-        return lstBytes[0];
+        return lstBytes;
     }
 
     readFirmwareBin() {

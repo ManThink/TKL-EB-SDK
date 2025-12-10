@@ -194,7 +194,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
       "SwVersion": 30,
       // "BzType": 416,
       // "BzVersion": 10, 
-      "FilterMask": 0,
+      "FilterMask": 1,
       "OtaMask": 6,
       "WakeupIn": false,
       "WakeupOut": false,
