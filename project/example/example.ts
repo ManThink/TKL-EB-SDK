@@ -12,8 +12,6 @@ import {
 import {CheckbitEnum, getOtaConfig, HwTypeEnum, UpgrdTypeEnum} from "@EBSDK/otaConfig";
 
 let otaConfig = getOtaConfig({
-    UpgrdType: UpgrdTypeEnum.GW,
-    HwType: HwTypeEnum.OM822, // CN470 and EN470 used OM422 otherwise is OM822
     BaudRate: 9600,
     StopBits: 1,
     DataBits: 8,

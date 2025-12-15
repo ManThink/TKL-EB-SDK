@@ -58,6 +58,11 @@ export class EBBuffer {
     return new CopyData(`${this.name}.${bufferOffset}=${vale}`, true)
   }
 
+  copy(sourceBuffer:EBBuffer, sourceOffset: number, sourceLength: number, targetOffset): CopyData {
+    let vale = sourceBuffer._readCopySource( sourceOffset, sourceLength).getValue();
+    return new CopyData(`${this.name}.${targetOffset}=${vale}`, true)
+  }
+
   /** 
    * Reads data from the current buffer for internal copy operations.
    * @param bufferOffset The offset in the current buffer to start reading from.

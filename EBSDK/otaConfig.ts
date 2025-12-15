@@ -94,9 +94,9 @@ export enum UpgrdTypeEnum{
 }
 
 export interface GetOtaConfigInput {
-  UpgrdType: OtaConfig["UpgradeOption"]["UpgrdType"];
+  UpgrdType?: OtaConfig["UpgradeOption"]["UpgrdType"];
 
-  HwType: OtaConfig["AppPara"]["HwType"];
+  HwType?: OtaConfig["AppPara"]["HwType"];
   
   BaudRate: OtaConfig["AppPara"]["BaudRate"];
   
@@ -152,11 +152,11 @@ export interface GetOtaConfigInput {
  */
 export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
  
-  if(!otaConfig.UpgrdType) {
-    throw new Error("UpgrdType is required");
+  // if(!otaConfig.UpgrdType) {
+  //   throw new Error("UpgrdType is required");
 
-  }
-  let UpgrdType = otaConfig.UpgrdType;
+  // }
+  // let UpgrdType = otaConfig.UpgrdType;
   let otaConfigCopy = JSON.parse(JSON.stringify(otaConfig));
   delete otaConfigCopy.UpgrdType;
   let appPara = otaConfigCopy;
@@ -177,7 +177,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
 
   return {
     "UpgradeOption": {
-      "UpgrdType": UpgrdType,
+      "UpgrdType": UpgrdTypeEnum.GW,
       "AppEui": "8100000002000001",
       "Addr": "0x02",
       "devEUI": [
@@ -189,7 +189,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
     },
     "AppPara": {
       "FuotaVersion": 1,
-      // "HwType": HwType,
+      "HwType": HwTypeEnum.OM822,
       "HwVersion": 2,
       "SwVersion": 30,
       // "BzType": 416,
