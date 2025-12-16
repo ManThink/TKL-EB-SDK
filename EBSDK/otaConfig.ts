@@ -164,7 +164,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
     throw new Error("BaudRate must be an integer multiple of 1200.");
   } 
   let notNullFields = [
-    "HwType", "BzType", "BzVersion", "BaudRate", 
+    "BzType", "BzVersion", "BaudRate", 
     "StopBits", "DataBits", "Checkbit", "Battery",
     "ConfirmDuty"
   ]
