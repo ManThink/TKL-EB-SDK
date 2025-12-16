@@ -4,3 +4,4 @@ node_modules
 # /project/test*
 /project/*/release
 /project/test*/**
+/project/private/*

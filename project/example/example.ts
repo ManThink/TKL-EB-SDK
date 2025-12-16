@@ -81,22 +81,14 @@ const MODBUS_TT = (ebModel: EBModel) => {
         condition: ExprCondition.ONTIME
     })
     // a copy action from ackBuffer of quEvent1
-    quEvent1.pushEBData(upEvent1.txBuffer.copyFrom(
-            {
-                bufferOffset: 5,
-                byteLength: 4,
-                buffer: quEvent1.ackBuffer
-            }, 6),{
+    quEvent1.pushEBData(upEvent1.txBuffer.copy(quEvent1.ackBuffer,5,4,6),
+        {
             condition: ExprCondition.ONTIME,
         }
     )
     //copy bytes from APP ,this byte is battery voltage
-    quEvent1.pushEBData(upEvent1.txBuffer.copyFrom(
-            {
-                bufferOffset: 31,
-                byteLength: 1,
-                buffer: APP
-            }, 10),{
+    quEvent1.pushEBData(upEvent1.txBuffer.copy(APP,31,1,10),
+        {
             condition: ExprCondition.ONTIME,
         }
     )
@@ -104,7 +96,7 @@ const MODBUS_TT = (ebModel: EBModel) => {
     quEvent1.pushEBData(upEvent1.txBuffer.writeUint16LE(
         quEvent1.ackBuffer.readUint16LE(11), 2),{
         condition: ExprCondition.ONTIME,
-        ActAfterCvt:ActionAfertExpr.ALWAYS
+        ActAfterCvt:ActionAfertExpr.UP_TO_RESULT
     })
     // ----------------------------------------------------
     return JSON.stringify(ebModel, null, 2)
