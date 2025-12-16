@@ -42,9 +42,9 @@ export class CvtRule  {
    * @description - Number of repetitions, defaults to 1.
    *
    * For a calc action, the loop operation count is implemented with the following result:
-   * 
+   * The second parameter of writeUintLE is the loop step.
    * ``` 
-   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(2,7),3,6), {condition: ExprCondition.ONTIME})
+   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(2,7),,6), {condition: ExprCondition.ONTIME})
    * ```
    * is equivalent to:
    * ```
