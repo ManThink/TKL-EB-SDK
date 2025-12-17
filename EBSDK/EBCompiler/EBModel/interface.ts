@@ -251,18 +251,18 @@ export interface CvtRuleInitProp {
    * For a calc action, the loop operation count is implemented with the following result:
    * 
    * ``` 
-   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(2,7),3,6), {condition: ExprCondition.ONTIME})
+   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(2,7),3,7), {Repeat: 3})
    * ```
    * is equivalent to:
    * ```
    *    // Iteration 1: Read from position 2
-   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(2,7),3,6));
+   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(2,7),3,7));
    * 
    *    // Iteration 2: Read from position 9 (2 + 7)
-   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(9,7),9,6));
+   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(9,7),10,7));
    * 
    *    // Iteration 3: Read from position 16 (9 + 7)
-   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(16,7),16,6));
+   *    quEvent1.pushEBData(upEvent1.txBuffer.writeUintLE(quEvent1.ackBuffer.readBcd(16,7),17,7));
    * ```
    */
   Repeat?: number | null;
