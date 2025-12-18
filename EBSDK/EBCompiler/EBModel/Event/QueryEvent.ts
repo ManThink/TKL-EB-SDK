@@ -290,7 +290,7 @@ export class QueryEvent extends BaseEvent {
       },
       appBufferCovThresholdIndex:number,
       txCovResultIndex:number,
-      binaryDataType: "Uint8" | "Int8" | "Int16BE" | "Int16LE" | "Uint16BE" | "Uint16LE"  | "Int32BE" | "Int32LE" | "Uint32BE" | "Uint32LE" 
+      binaryDataType: "Uint8" | "Int8" | "Int16BE" | "Int16LE" | "Uint16BE" | "Uint16LE"  | "Int32BE" | "Int32LE" | "Uint32BE" | "Uint32LE" | "FloatBE" | "FloatLE"
     }
     
   ):number {
@@ -317,7 +317,7 @@ export class QueryEvent extends BaseEvent {
       QueryEvent.ebModel.sensorDataBufferOffset += 1
     } else if (["Int16BE", "Int16LE", "Uint16BE", "Uint16LE" ].includes(binaryDataType)) {
       QueryEvent.ebModel.sensorDataBufferOffset += 2
-    } else if (["Int32BE", "Int32LE", "Uint32BE", "Uint32LE" ].includes(binaryDataType))  {
+    } else if (["Int32BE", "Int32LE", "Uint32BE", "Uint32LE", "FloatBE", "FloatLE" ].includes(binaryDataType))  {
       return QueryEvent.ebModel.sensorDataBufferOffset += 4
     }
 

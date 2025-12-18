@@ -42,7 +42,7 @@ export class UpAfterQueryEvent {
     let txBuffer = Buffer.alloc(ackMaxlen)
     this.loraUpEvent= new LoraUpEvent("upAfter"+name,{
         txBuffer:txBuffer,
-        txPort:51,
+        txPort:9,
     }).setPeriod(0x2FFF * 24 * 60 * 60) 
 
     this.queryEvent._setUpAfterQuery(this.loraUpEvent);
@@ -60,6 +60,19 @@ export class UpAfterQueryEvent {
     this.queryEvent.setPeriod(period, offsetSecond);
     return this
   }
+
+
+  /**
+   * Configures the period using a register address mapping.
+   * 
+   * @param unit8_addr - Register address (0x00-0xC4) for period configuration
+   * @returns Current instance for chaining
+   */
+  setPeriodFromApp(unit8_addr:number) {
+    this.queryEvent.setPeriodFromApp(unit8_addr)
+    return this;
+  }
+
 
    /**
    * Sets the query CRC parameters for the internal QueryEvent.
