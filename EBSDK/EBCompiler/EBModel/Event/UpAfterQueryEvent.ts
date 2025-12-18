@@ -22,7 +22,7 @@ export class UpAfterQueryEvent {
    * The command buffer for the query event, exposed for direct manipulation.
    * This is equivalent to the cmdBuffer of the internal QueryEvent.
    */
-  public queryCmdBuffer: EBBuffer;
+  public cmdBuffer: EBBuffer;
 
    /**
    * Constructor for UpAfterQueryEvent.
@@ -37,7 +37,7 @@ export class UpAfterQueryEvent {
         cmdBuffer:cmdbuffer,
         ackBuffer:ackbuffer,
     });
-    this.queryCmdBuffer = this.queryEvent.cmdBuffer;
+    this.cmdBuffer = this.queryEvent.cmdBuffer;
 
     let txBuffer = Buffer.alloc(ackMaxlen)
     this.loraUpEvent= new LoraUpEvent("upAfter"+name,{
