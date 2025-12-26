@@ -50,23 +50,23 @@ export class EBModel {
   /**
    * build-in buffer => new EBBuffer("app", Buffer.alloc(255));
    */
-  APP = new EBBuffer("app", Buffer.alloc(255));
+  static APP = new EBBuffer("app", Buffer.alloc(255));
   /**
    * build-in buffer => new EBBuffer("appsts", Buffer.alloc(32));
    */
-  APP_STATUS = new EBBuffer("appsts", Buffer.alloc(32));
+  static APP_STATUS = new EBBuffer("appsts", Buffer.alloc(32));
   /**
    * build-in buffer => new EBBuffer("sensor", Buffer.alloc(128));
    */
-  SENSOR_DATA = new EBBuffer("sensor", Buffer.alloc(128));
+  static SENSOR_DATA = new EBBuffer("sensor", Buffer.alloc(128));
   /**
    * build-in buffer => new EBBuffer("temp", Buffer.alloc(128));
    */
-  TEMPLATE = new EBBuffer("temp", Buffer.alloc(128));
+  static TEMPLATE = new EBBuffer("temp", Buffer.alloc(128));
   /**
    * build-in buffer => new EBBuffer("ds", Buffer.alloc(16));
    */
-  DEVICE_STATUS = new EBBuffer("ds", Buffer.alloc(16));
+  static DEVICE_STATUS = new EBBuffer("ds", Buffer.alloc(16));
 
   /**
    * The current writing offset within the `SENSOR_DATA` buffer, used

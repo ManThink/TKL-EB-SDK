@@ -298,14 +298,14 @@ export class QueryEvent extends BaseEvent {
     let writeFun = `write${binaryDataType}`;
     let readFun = `read${binaryDataType}`
     this.pushEBData(
-      QueryEvent.ebModel.SENSOR_DATA[writeFun]( this.ackBuffer[readFun](ackBufferIndex), sensorDataBufferOffset),{condition: ExprCondition.ONTIME}
+      EBModel.SENSOR_DATA[writeFun]( this.ackBuffer[readFun](ackBufferIndex), sensorDataBufferOffset),{condition: ExprCondition.ONTIME}
     )
     this.pushEBData(
       up.event.txBuffer.writeUint8( 
         up.event.txBuffer[readFun](up.txBufferIndex)
-          .minus(QueryEvent.ebModel.SENSOR_DATA[readFun](sensorDataBufferOffset))
+          .minus(EBModel.SENSOR_DATA[readFun](sensorDataBufferOffset))
           .absolute()
-          .greaterThan(QueryEvent.ebModel.APP[readFun](appBufferCovThresholdIndex)),
+          .greaterThan(EBModel.APP[readFun](appBufferCovThresholdIndex)),
         txCovResultIndex
       ), 
       {
@@ -313,13 +313,19 @@ export class QueryEvent extends BaseEvent {
           ActAfterCvt:ActionAfertExpr.UP_TO_RESULT 
       }
     )
+
+    let bufferOffset = 0;
     if(["Uint8" , "Int8"].includes(binaryDataType)) {
-      QueryEvent.ebModel.sensorDataBufferOffset += 1
+      bufferOffset = 1;
+      
     } else if (["Int16BE", "Int16LE", "Uint16BE", "Uint16LE" ].includes(binaryDataType)) {
-      QueryEvent.ebModel.sensorDataBufferOffset += 2
+      bufferOffset = 2;
     } else if (["Int32BE", "Int32LE", "Uint32BE", "Uint32LE", "FloatBE", "FloatLE" ].includes(binaryDataType))  {
-      return QueryEvent.ebModel.sensorDataBufferOffset += 4
+      bufferOffset = 4;
     }
+    
+    QueryEvent.ebModel.sensorDataBufferOffset = bufferOffset
+    up.event.pushEBData(up.event.txBuffer.copy(EBModel.SENSOR_DATA, sensorDataBufferOffset, bufferOffset, up.txBufferIndex))
 
     return sensorDataBufferOffset
   }
