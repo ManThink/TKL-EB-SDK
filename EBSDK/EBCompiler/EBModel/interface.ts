@@ -274,3 +274,7 @@ export interface CvtRuleInitProp {
   ActAfterCvt?: ActionAfertExpr | null; 
   CvtRule: string; 
 }
+
+
+
+export type SetUpCovDataType  = "Uint8" | "Int8" | "Int16BE" | "Int16LE" | "Uint16BE" | "Uint16LE"  | "Int32BE" | "Int32LE" | "Uint32BE" | "Uint32LE" | "FloatBE" | "FloatLE"

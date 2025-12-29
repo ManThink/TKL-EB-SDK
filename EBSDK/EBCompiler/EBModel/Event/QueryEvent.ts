@@ -2,7 +2,7 @@ import { EBBuffer } from "../EBBuffer";
 import { EBModel } from "../EBModel";
 import { CopyRule, CvtRule } from "../EBRule";
 import { ActionAfertExpr, CrcMode, CrcPosition, ExprCondition, IfSelectEnum } from "../EBEnum";
-import { CrcOption, CrcPara, PeriodValue, TagCheckProp } from "../interface";
+import { CrcOption, CrcPara, PeriodValue, SetUpCovDataType, TagCheckProp } from "../interface";
 import { BaseEvent } from "./BaseEvent";
 import { Buffer } from "buffer";
 import { LoraUpEvent } from "./LoraUpEvent";
@@ -290,7 +290,7 @@ export class QueryEvent extends BaseEvent {
       },
       appBufferCovThresholdIndex:number,
       txCovResultIndex:number,
-      binaryDataType: "Uint8" | "Int8" | "Int16BE" | "Int16LE" | "Uint16BE" | "Uint16LE"  | "Int32BE" | "Int32LE" | "Uint32BE" | "Uint32LE" | "FloatBE" | "FloatLE"
+      binaryDataType: SetUpCovDataType
     }
     
   ):number {

@@ -191,7 +191,7 @@ export const getOtaConfig = (otaConfig: GetOtaConfigInput):OtaConfig =>{
       "FuotaVersion": 1,
       "HwType": HwTypeEnum.OM822,
       "HwVersion": 2,
-      "SwVersion": 30,
+      "SwVersion": 31,
       // "BzType": 416,
       // "BzVersion": 10, 
       "FilterMask": 1,
