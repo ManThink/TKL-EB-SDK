@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
-import { EBModel, LoraUpEvent, QueryEvent, EBBuffer } from "@EBSDK/EBCompiler/all_variable";
+import { EBModel, LoraUpEvent, QueryEvent, EBBuffer, VERSION } from "@EBSDK/EBCompiler/all_variable";
 import path, { join } from "path";
 import { OtaConfig } from "@EBSDK/otaConfig";
 
@@ -8,6 +8,7 @@ const {MT_BllObin} = require( "./EBObin/eb-bllObin.js")
 
 
 export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, MODBUS_TT:Function) {
+  console.log("EBSDK VERSION => ",  VERSION);
   const ebModel = new EBModel();
   QueryEvent.ebModel = ebModel;
   LoraUpEvent.ebModel = ebModel;

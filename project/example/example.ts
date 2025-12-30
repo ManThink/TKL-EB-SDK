@@ -23,11 +23,11 @@ let otaConfig = getOtaConfig({
     SwVersion: 31
 })
 const MODBUS_TT = (ebModel: EBModel) => {
-    const APP = ebModel.APP;
-    const APP_STATUS = ebModel.APP_STATUS;
-    const SENSOR_DATA = ebModel.SENSOR_DATA;
-    const TEMPLATE = ebModel.TEMPLATE;
-    const DEVICE_STATUS = ebModel.DEVICE_STATUS;
+    const APP = EBModel.APP;
+    const APP_STATUS = EBModel.APP_STATUS;
+    const SENSOR_DATA = EBModel.SENSOR_DATA;
+    const TEMPLATE = EBModel.TEMPLATE;
+    const DEVICE_STATUS = EBModel.DEVICE_STATUS;
 ///////////////////////////////////////////////////////////////////////////////
     
     // the Buffer which will be transmitted to sub device by UART/RS-485/M-Bus

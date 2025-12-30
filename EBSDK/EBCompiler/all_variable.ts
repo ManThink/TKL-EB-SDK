@@ -16,3 +16,6 @@ export * from "@EBSDK/EBCompiler/EBModel/interface"
 export * from "@EBSDK/otaConfig";
 export * from "@EBSDK/run"
 
+
+
+export const VERSION = "3.01.001";
