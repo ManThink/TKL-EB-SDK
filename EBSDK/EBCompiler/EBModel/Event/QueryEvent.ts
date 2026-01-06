@@ -12,7 +12,7 @@ import { LoraUpEvent } from "./LoraUpEvent";
  */
 export class QueryEvent extends BaseEvent {
   /** Static property to store the EBModel instance. */
-  static ebModel: EBModel | null = null; 
+  static ebModel: EBModel; 
 
   private UpAfterQuery: boolean = false; 
   private UpAfterQueryEventIdx: number = 0;
@@ -294,17 +294,22 @@ export class QueryEvent extends BaseEvent {
     }
     
   ):number {
+    // @ts-ignore
     let sensorDataBufferOffset =  QueryEvent.ebModel.sensorDataBufferOffset;
     let writeFun = `write${binaryDataType}`;
-    let readFun = `read${binaryDataType}`
+    let readFun = `read${binaryDataType}`;
     this.pushEBData(
+      // @ts-ignore
       EBModel.SENSOR_DATA[writeFun]( this.ackBuffer[readFun](ackBufferIndex), sensorDataBufferOffset),{condition: ExprCondition.ONTIME}
     )
     this.pushEBData(
       up.event.txBuffer.writeUint8( 
+        // @ts-ignore
         up.event.txBuffer[readFun](up.txBufferIndex)
+            // @ts-ignore
           .minus(EBModel.SENSOR_DATA[readFun](sensorDataBufferOffset))
           .absolute()
+          // @ts-ignore
           .greaterThan(EBModel.APP[readFun](appBufferCovThresholdIndex)),
         txCovResultIndex
       ), 
