@@ -40,8 +40,9 @@ class MT_BllFuotaPackets {
     checkBin(bin) {
         const len = bin[2] + (bin[3] << 8);
         if (bin === null || len !== bin.length || bin[0] !== this.BIN_HEADER || bin[bin.length - 1] !== this.BIN_TAIL) {
-            console.log("wrong format of bin file");
-            return false;
+            throw new Error("wrong format of bin file")
+            // console.log("wrong format of bin file");
+            // return false;
         }
         return true;
     }
@@ -56,35 +57,37 @@ class MT_BllFuotaPackets {
 
     readBllBin() {
         let lstBytes = [];
-        try {
+        // try {
             const data = this.binBuffer;
             const len = data[4] + (data[5] << 8);
             if (!this.checkBlock(data.slice(0, this.BLOCK_SIZE))) {
-                console.log("wrong crc of first block!");
-                return null;
+                throw new Error("wrong crc of first block!") 
+                // console.log("wrong crc of first block!");
+                // return null;
             }
-
+ 
             if (len > this.BLOCK_SIZE - this.CRC_SIZE) {
                 lstBytes.push(...data.slice(this.CRC_SIZE, this.BLOCK_SIZE));
                 if (!this.checkBlock(data.slice(this.BLOCK_SIZE, 2048))) {
-                    console.log("wrong crc of second block!");
-                    return null;
+                    throw new Error("wrong crc of first block!") 
+                    // console.log("wrong crc of second block!");
+                    // return null;
                 }
-                let a = data.slice(this.BLOCK_SIZE + this.CRC_SIZE, len + this.CRC_SIZE);
-
                 lstBytes.push(...data.slice(this.BLOCK_SIZE + this.CRC_SIZE, len + 2 * this.CRC_SIZE)) 
             } else {
                 lstBytes.push(...data.slice(this.CRC_SIZE, len + this.CRC_SIZE))
             }
 
             if (!this.checkBin(lstBytes)) {//转为buffer
-                console.log("wrong format of bin file");
-                return null;
+                throw new Error("wrong crc of first block!") 
+                // console.log("wrong format of bin file");
+                // return null;
             }
-        } catch (ex) {
-            console.log("reading bin file failed: " + ex.toString());
-            return null;
-        }
+        // } catch (ex) {
+        //     throw new Error("reading bin file failed:" + ex.toString()) 
+        //     // console.log("reading bin file failed: " + ex.toString());
+        //     // return null;
+        // }
         return lstBytes;
     }
 
@@ -94,8 +97,9 @@ class MT_BllFuotaPackets {
             const data = this.binBuffer;
             lstBytes = lstBytes.concat(data);
         } catch (ex) {
-            console.log("reading bin file failed: " + ex.toString());
-            return null;
+            throw new Error("reading bin file failed:" + ex.toString()) 
+            // console.log("reading bin file failed: " + ex.toString());
+            // return null;
         }
         return lstBytes;
     }

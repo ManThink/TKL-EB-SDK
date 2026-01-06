@@ -376,9 +376,9 @@ class EBcompile{
         {
             throw new Error("bll para is null")
         }
-        if (binBytes.Count > 2048)
+        if (binBytes.length > 2048)
         {
-            throw new Error("bll para is null")
+            throw new Error(`Binary buffer size exceeds limit: ${binBytes.length} bytes > 2048 bytes (2KB).`)
         }
         this._binBuffer = binBytes;
         return this
