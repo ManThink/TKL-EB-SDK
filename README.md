@@ -13,3 +13,7 @@
 ## 3.01.002
 1. Throw an exception when the binary file size exceeds 2KB (2048 bytes).
 2. Optimize exception handling during .obin file construction.
+
+## 3.01.003
+1. Register address for modifying heart_period in EBSDK
+2. Adding EBHelper to EBSDK

@@ -42,12 +42,19 @@ export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, M
       byteLength: 3,
       buffer: APP
   }, 10))
-  // copy 7 bytes which including the heart period and the device counts of multi sub devices
+
+  // copy 6 bytes which including the heart period and pwron_dealy(power on delay)
   heartLoraUpEvent.pushEBData(heartLoraUpEvent.txBuffer.copyFrom({
-      bufferOffset: 58,
-      byteLength: 7,
+      bufferOffset: 38,
+      byteLength: 6,
       buffer: APP
   }, 13))
+  // copy 1 bytes which is multidev_devicecount
+  heartLoraUpEvent.pushEBData(heartLoraUpEvent.txBuffer.copyFrom({
+      bufferOffset: 60,
+      byteLength: 1,
+      buffer: APP
+  }, 19))
 
   let interJson = MODBUS_TT(ebModel)
 
