@@ -18,4 +18,4 @@ export * from "@EBSDK/otaConfig";
 export * from "@EBSDK/run"
 
 
-export const VERSION = "3.01.002";
+export const VERSION = "3.01.003";
