@@ -43,7 +43,7 @@ export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, M
       buffer: APP
   }, 10))
 
-  // copy 6 bytes which including the heart period and pwron_dealy(power on delay)
+  // copy 6 bytes which including the pwron_dealy(power on delay)[2 bytes] and heart period[4 bytes]
   heartLoraUpEvent.pushEBData(heartLoraUpEvent.txBuffer.copyFrom({
       bufferOffset: 38,
       byteLength: 6,
