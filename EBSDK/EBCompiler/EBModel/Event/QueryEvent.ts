@@ -329,7 +329,7 @@ export class QueryEvent extends BaseEvent {
       bufferOffset = 4;
     }
     
-    QueryEvent.ebModel.sensorDataBufferOffset = bufferOffset
+    QueryEvent.ebModel.sensorDataBufferOffset += bufferOffset
     up.event.pushEBData(up.event.txBuffer.copy(EBModel.SENSOR_DATA, sensorDataBufferOffset, bufferOffset, up.txBufferIndex))
 
     return sensorDataBufferOffset
