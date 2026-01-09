@@ -17,3 +17,6 @@
 ## 3.01.003
 1. Register address for modifying heart_period in EBSDK
 2. Adding EBHelper to EBSDK
+
+## 3.01.004
+1. Fix the bug in EBHelper.

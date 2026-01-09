@@ -5,7 +5,7 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-
+const version="1.02.001"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -656,12 +656,16 @@ class EventInfoItem {
             const quInstance = new ItemClass(item);
             quInstance.init()
             this.txLength += quInstance.txDataLen;
-            if ((this.eventPara.upPeriod.val >= Utils.PERIOD_MAX) && i === qcounts - 1) {
+            if ((this.eventPara.upPeriod.val >= Utils.PERIOD_MAX)&&(this.eventPara.upPeriod.index!==Utils.INVALID_NUM) && i === qcounts - 1) {
                 quInstance.isLast = true;
             }
-            if(quInstance.protocol=="DLT64507" && this.eventPara.addrSize<6) { this.eventPara.addrSize=6}
+            this.protocolBuild(quInstance.protocol)
             this.quInfo.push(quInstance);
         }
+    }
+    protected protocolBuild( protocol:string) {
+        if(protocol=="DLT64507" && this.eventPara.addrSize<6) { this.eventPara.addrSize=6}
+        return
     }
     upEventSetup() {
         let txBuffer = Buffer.alloc(5+this.eventPara.addrSize+this.txLength);
@@ -687,6 +691,6 @@ class EventInfoItem {
         })
     }
 }
-export {Utils,UserConfQueryItem,UserConfUPItem,TypeVal,TypeProtocol,TypeQuItem,QuItemMap,
+export {version,Utils,UserConfQueryItem,UserConfUPItem,TypeVal,TypeProtocol,TypeQuItem,QuItemMap,
         ConfigPreCopy,ConfigPeriod,TagItem,ValItem,EventConfig,
         QuFrameInfo,QuItemBase,QuItemModBus,QuItemModBusBitCov,QuItemDLT64507,EventInfoItem}
