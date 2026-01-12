@@ -5,7 +5,7 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-const version="1.02.001"
+const version="1.02.002"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -642,17 +642,17 @@ const DEFAULT_QuItem = QuItemAny;
 //////////////////////////////////////////////////////////////////////
 class EventInfoItem {
     eventPara: EventConfig;
-    quInfo: TypeQuItem[];
+    quInfo: Array<QuItemBase>;
     upEvent:LoraUpEvent;
     txLength:number;
-    constructor(data?: Partial<UserConfUPItem>) {
+    constructor(data?: Partial<UserConfUPItem>,option?:{quItemClass?:new () => QuItemBase}) {
         this.eventPara=new EventConfig(data);
         this.txLength=0
         this.quInfo=[]
         let qcounts=data?.quInfo?.length
         for (let i=0;i<qcounts;i++) {
             let item=data?.quInfo[i]
-            const ItemClass = QuItemMap[item.protocol] || DEFAULT_QuItem;
+            const ItemClass = option?.quItemClass??(QuItemMap[item.protocol] || DEFAULT_QuItem);
             const quInstance = new ItemClass(item);
             quInstance.init()
             this.txLength += quInstance.txDataLen;
