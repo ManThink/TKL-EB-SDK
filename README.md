@@ -21,3 +21,6 @@
 ## 3.01.004
 1. Fix the bug in EBHelper.
 2. FIxed setupCov
+
+## 3.01.005
+1. Fix the bug in EBHelper.

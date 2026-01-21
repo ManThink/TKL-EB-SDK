@@ -5,7 +5,7 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-const version="1.02.002"
+const version="1.02.003"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -26,16 +26,16 @@ class Utils{
     public static readonly PERIOD_TRIGGER="trigger";
     public static readonly PERIOD_MAX =86400*365
     static parseVal(valstr:string):number{
-    let val=valstr.toLowerCase();
-    if (val.includes("0x")){
-         val=val.replaceAll("0x","").replaceAll(" ","");
-        let cleanedHex =val.length % 2 === 0 ? val : '0' + val;
-        return parseInt(cleanedHex, 16);
-    }
-    return parseInt(val,10)
+        let val=valstr.toLowerCase();
+        if (val.includes("0x")){
+            val=val.replaceAll("0x","").replaceAll(" ","");
+            let cleanedHex =val.length % 2 === 0 ? val : '0' + val;
+            return parseInt(cleanedHex, 16);
+        }
+        return parseInt(val,10)
     }
     static parseSeconds(time :string){
-    let valTime=time.replaceAll(" ","").toLowerCase()
+        let valTime=time.replaceAll(" ","").toLowerCase()
         if (valTime.length==1) {    return parseInt(valTime,10)}
         const valueStr = valTime.slice(0, -1);
         const unit = valTime.slice(-1).toLowerCase();
@@ -656,8 +656,12 @@ class EventInfoItem {
             const quInstance = new ItemClass(item);
             quInstance.init()
             this.txLength += quInstance.txDataLen;
-            if ((this.eventPara.upPeriod.val >= Utils.PERIOD_MAX)&&(this.eventPara.upPeriod.index!==Utils.INVALID_NUM) && i === qcounts - 1) {
-                quInstance.isLast = true;
+            if(quInstance.isLast==undefined) {
+                if ((this.eventPara.upPeriod.val >= Utils.PERIOD_MAX)&&(this.eventPara.upPeriod.index!==Utils.INVALID_NUM) && i === qcounts - 1) {
+                    quInstance.isLast = true;
+                }else {
+                    quInstance.isLast = false;
+                }
             }
             this.protocolBuild(quInstance.protocol)
             this.quInfo.push(quInstance);
@@ -692,5 +696,5 @@ class EventInfoItem {
     }
 }
 export {version,Utils,UserConfQueryItem,UserConfUPItem,TypeVal,TypeProtocol,TypeQuItem,QuItemMap,
-        ConfigPreCopy,ConfigPeriod,TagItem,ValItem,EventConfig,
-        QuFrameInfo,QuItemBase,QuItemModBus,QuItemModBusBitCov,QuItemDLT64507,EventInfoItem}
+    ConfigPreCopy,ConfigPeriod,TagItem,ValItem,EventConfig,
+    QuFrameInfo,QuItemBase,QuItemModBus,QuItemModBusBitCov,QuItemDLT64507,EventInfoItem}
