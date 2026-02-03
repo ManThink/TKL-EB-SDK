@@ -23,13 +23,6 @@ let otaConfig = getOtaConfig({
     SwVersion: 31
 })
 const MODBUS_TT = (ebModel: EBModel) => {
-    const APP = EBModel.APP;
-    const APP_STATUS = EBModel.APP_STATUS;
-    const SENSOR_DATA = EBModel.SENSOR_DATA;
-    const TEMPLATE = EBModel.TEMPLATE;
-    const DEVICE_STATUS = EBModel.DEVICE_STATUS;
-///////////////////////////////////////////////////////////////////////////////
-    
     // the Buffer which will be transmitted to sub device by UART/RS-485/M-Bus
     let cmdBuffer1=Buffer.from("12345678b1b2b3b4b5b6b7b8b9".replaceAll(" ", ""), "hex")
     // The expected message from the child device does not need to fully match the content, but its length should be greater than the actual reply.
@@ -87,7 +80,7 @@ const MODBUS_TT = (ebModel: EBModel) => {
         }
     )
     //copy bytes from APP ,this byte is battery voltage
-    quEvent1.pushEBData(upEvent1.txBuffer.copy(APP,31,1,10),
+    quEvent1.pushEBData(upEvent1.txBuffer.copy(EBModel.APP,31,1,10),
         {
             condition: ExprCondition.ONTIME,
         }

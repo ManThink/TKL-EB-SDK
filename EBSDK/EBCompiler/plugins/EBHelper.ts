@@ -5,7 +5,7 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-const version="1.02.003"
+const version="1.02.005"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -267,9 +267,10 @@ class QuFrameInfo{
             let valItem=new ValItem(item)
             listVal.push(valItem)
         })
+        this.group=0
+        if (listVal.length===0) {return }
         this.start = listVal[0].start;
         this.end = listVal[0].end;
-        this.group=0
         listVal.forEach(data => {
             if (data.start < this.start) this.start = data.start;
             if (data.end > this.end) this.end = data.end;
@@ -409,13 +410,14 @@ abstract class QuItemBase {
         quEvent:QueryEvent,
         txIndex:number}) {
         let txIndex:number=data.txIndex;
+        let  txDataLen=0
         this.listVal.forEach(val=>{
             let txInfo:{txIndex:number,txLength:number}
             txInfo = val.processAck(
                 this.quEvent, data.upEvent, txIndex, data.eventPara.indexCovStatus
             )
             txIndex=txInfo.txIndex;
-            this.txDataLen+=txInfo.txLength
+            txDataLen+=txInfo.txLength
         })
         return txIndex
     }
