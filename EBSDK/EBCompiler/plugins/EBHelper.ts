@@ -5,7 +5,7 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-const version="1.02.005"
+const version="1.02.006"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -470,6 +470,7 @@ abstract class QuItemBase {
         this.quEvent.pushEBData(upEvent.txBuffer.copy(this.quEvent.ackBuffer,this.ackAddrIndex,eventPara.addrSize,eventPara.indexAddr),{condition:ExprCondition.ONTIME})
         let act=ActionAfertExpr.NONE
         if (this.isLast) { act=ActionAfertExpr.ALWAYS }
+        this.quEvent.pushEBData(upEvent.txBuffer.writeUint8(EBModel.DEVICE_STATUS.readUint8(3),eventPara.indexBattery),{ActAfterCvt:act})
         this.quEvent.pushEBData(upEvent.txBuffer.writeUint8(EBModel.APP_STATUS.readUint8(2),eventPara.indexStatus),{ActAfterCvt:act})
         return txIndex
     }
