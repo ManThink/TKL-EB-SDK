@@ -25,5 +25,6 @@
 ## 3.01.005
 1. Fix the bug in EBHelper.
 
-## 3.01.018 
+## 3.01.007 
+tkl_version => 3.00.018
 1. For otaConfig.AppPara.swVersion < 32, the event.setPeriod value is limited to a maximum of 30 days. Values exceeding this will revert to 30 days.
