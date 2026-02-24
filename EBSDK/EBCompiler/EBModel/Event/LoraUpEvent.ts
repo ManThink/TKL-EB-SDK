@@ -59,6 +59,21 @@ export class LoraUpEvent extends BaseEvent {
     this.type = type;
     LoraUpEvent.ebModel?.addEvent(this);
   }
+  /**
+   * Sets the period of the event. The default unit is seconds. 
+   * The unit is converted to the next larger unit if the period value exceeds the maximum period value.
+   * @param period The period value in seconds.
+   * @returns The current object (for chaining).
+   */
+  setPeriod(period: number) {
+    if (LoraUpEvent.ebModel.otaConfig.AppPara.SwVersion < 32) {
+      if (period > 30 * 24 * 60 * 60) {
+        period = 30 * 24 * 60 * 60
+      }
+    }
+    super.setPeriod(period)
+    return this
+  }
 
   /**
    * Converts the event object to JSON format.

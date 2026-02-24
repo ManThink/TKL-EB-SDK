@@ -244,6 +244,11 @@ export class QueryEvent extends BaseEvent {
    * @returns The current object (for chaining).
    */
   setPeriod(period: number, offsetSecond?: number): this {
+    if (QueryEvent.ebModel.otaConfig.AppPara.SwVersion < 32) {
+      if (period > 30 * 24 * 60 * 60) {
+        period = 30 * 24 * 60 * 60
+      }
+    }
     super.setPeriod(period);
     if (offsetSecond == null || offsetSecond === undefined) {
       this.fixedAcq = false;

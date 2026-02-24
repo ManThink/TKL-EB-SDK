@@ -1,3 +1,4 @@
+import { OtaConfig } from "@EBSDK/otaConfig";
 import { EBBuffer } from "./EBBuffer";
 import { CrcMode, CrcPosition, ExprCondition } from "./EBEnum";
 import { LoraUpEvent } from "./Event/LoraUpEvent";
@@ -87,8 +88,11 @@ export class EBModel {
    */
   private QueryEventList: Array<QueryEvent> = []; // 查询事件列表
 
+  public otaConfig:OtaConfig = null;
 
-  constructor() {}
+  constructor(otaConfig) {
+    this.otaConfig = otaConfig;
+  }
   /**
    * Gets the current number of LoRa uplink events.
    * @returns The number of LoRa uplink events.

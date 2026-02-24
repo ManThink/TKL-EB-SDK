@@ -9,7 +9,7 @@ const {MT_BllObin} = require( "./EBObin/eb-bllObin.js")
 
 export async function buildOtaFile (filePath:string|null, otaConfig:OtaConfig, MODBUS_TT:Function) {
   console.log("EBSDK VERSION => ",  VERSION);
-  const ebModel = new EBModel();
+  const ebModel = new EBModel(otaConfig);
   QueryEvent.ebModel = ebModel;
   LoraUpEvent.ebModel = ebModel;
   const APP = new EBBuffer("app", Buffer.alloc(255));
