@@ -64,7 +64,10 @@ export class BaseEvent {
    * @returns The current object (for chaining).
    */
   setPeriod(period: number) {
-
+    if (period > 10 * 365 * 24 * 60 * 60 ) {
+      period = 10 * 365 * 24 * 60 * 60
+    }
+    
     let unit:PeriodValue['unit'] = PeriodUnit.SECOND;
     let periodValue = period;
     if (period < this.maxPeriodValue) {
