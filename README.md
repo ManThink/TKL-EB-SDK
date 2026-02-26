@@ -27,4 +27,5 @@
 
 ## 3.01.007 
 tkl_version => 3.00.018
-1. For otaConfig.AppPara.swVersion < 32, the event.setPeriod value is limited to a maximum of 30 days. Values exceeding this will revert to 30 days.  (Due to precision limitations in the C code, only 4-byte millisecond values can be recognized at most.)
+The event.setPeriod value is capped at 10 years (any excess will be reset to this limit), as the default random time is 4000 days and exceeding this could lead to sequencing problems.
+<!-- 1. For otaConfig.AppPara.swVersion < 32, the event.setPeriod value is limited to a maximum of 30 days. Values exceeding this will revert to 30 days.  (Due to precision limitations in the C code, only 4-byte millisecond values can be recognized at most.) -->
