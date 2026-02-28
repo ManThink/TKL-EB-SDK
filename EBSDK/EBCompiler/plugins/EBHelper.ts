@@ -5,7 +5,7 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-const version="1.02.006"
+const version="1.02.007"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -482,9 +482,11 @@ class QuItemAny extends QuItemBase {
     constructor(data?: Partial<UserConfQueryItem>) {    super(data);    }
 }
 class QuItemModBus extends QuItemBase {
+    freeValue:boolean;
     modBusFrameInfo :QuFrameInfo=new QuFrameInfo();
     constructor(data?: Partial<UserConfQueryItem>) {
         super(data);
+        this.freeValue=false
     }
     protected getPayIndex(): number { return 3}
     protected getAckAddrIndex(): number { return 0}
@@ -494,6 +496,7 @@ class QuItemModBus extends QuItemBase {
     }
     protected parseAck(inputStr: string | undefined): Buffer{
         if (inputStr===undefined) { return Buffer.alloc(0);   }
+        this.freeValue=true
         return QuItemAny.parseToBuffer(inputStr,"no ack")
     }
     protected parseAddr(inputStr: string | undefined): Buffer {
@@ -515,6 +518,10 @@ class QuItemModBus extends QuItemBase {
         covAppIndex?: number
         covType?: TypeVal
     }[]){
+        if (this.freeValue){
+            super.parseListVal(dataListVal)
+            return
+        }
         let listVal=[]
         this.modBusFrameInfo.getInfo(dataListVal)
         dataListVal.forEach(item=>{
@@ -538,11 +545,15 @@ class QuItemModBus extends QuItemBase {
     protected buildCommand(eventPara:EventConfig,upEvent:LoraUpEvent,txIndex:number):void{
         if (this.addr.length>0) { this.addr.copy(this.cmd,0) }
         if (this.code.length>0) { this.code.copy(this.cmd,1) }
+        if (this.freeValue){
+            super.buildCommand(eventPara,upEvent,txIndex); return
+        }
         this.cmd.writeUInt16BE(this.modBusFrameInfo.start,2)
         this.cmd.writeUInt16BE(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1,4)
         this.ack=Buffer.alloc(5+(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1)*2);
     }
     protected setDefaultTags(){
+        if (this.listTag.length!==0) { return; }
         if (this.preCopy.indexCMD!==0 && this.preCopy.indexCMD!==Utils.INVALID_NUM) { this.quEvent.addAckCheckRule(0, this.cmd[0]);}
         if(this.preCopy.indexCMD>1 && this.preCopy.indexCMD!==Utils.INVALID_NUM) {this.quEvent.addAckCheckRule(1, this.cmd[1]);}
         this.quEvent.addAckCheckRule(2,(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1)*2)
