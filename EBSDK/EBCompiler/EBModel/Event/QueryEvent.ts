@@ -254,6 +254,27 @@ export class QueryEvent extends BaseEvent {
     }
     return this;
   }
+
+    /**
+ * Configures the period using a register address mapping.
+ * 
+ * @param unit8_addr - Register address (0x00-0xC4) for period configuration
+ * @param {number} offsetSecond The offset in seconds (optional).
+ * - If provided, enables fixed-time acquisition with the specified offset;
+ * - if omitted, disables fixed-time acquisition.
+ * @returns Current instance for chaining
+ */
+  setPeriodFromApp(unit8_addr:number, offsetSecond?:number) {
+    super.setPeriodFromApp(unit8_addr);
+    if (offsetSecond == null || offsetSecond === undefined) {
+      this.fixedAcq = false;
+      this.fixedMoment = 0;
+    } else {
+      this.fixedAcq = true;
+      this.fixedMoment = offsetSecond;
+    }
+    return this;
+  }
   
   /**
    * Sets up a "Change of Value" (COV) detection rule.
