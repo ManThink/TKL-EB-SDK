@@ -5,18 +5,20 @@ import {ActionAfertExpr, CrcMode, ExprCondition} from "@EBSDK/EBCompiler/EBModel
 import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
-const version="1.02.007"
+import {isTypedArray} from "node:util/types";
+const version="1.02.008"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
     |"FloatCDAB"
     |"IntCDAB"
     |"UintCDAB"
-    |"INVALID";
+    |"INVALID"
 type TypeProtocol =
     |"DLT64507"
     |"modbus"
     |"modbusBitCov"
+    |"CJ188"
     |"any"
 class Utils{
     public static readonly INVALID_NUM=-1000000000
@@ -54,6 +56,7 @@ class Utils{
 interface UserConfQueryItem { //
     name?:string;
     protocol?: TypeProtocol; //
+    preamble?:number;
     isLast?: boolean;
     period?: string;
     periodIndex?: number;
@@ -291,6 +294,7 @@ abstract class QuItemBase {
     payIndex:number;
     ackAddrIndex:number;
     txDataLen:number=0;
+    preamble:number=5;
     listVal: ValItem[];
     listTag: TagItem[];
     quEvent: QueryEvent;
@@ -299,11 +303,12 @@ abstract class QuItemBase {
     _setuped =false
     static quIndex:number=0;
     constructor(data?: Partial<UserConfQueryItem>) {
-        this.isLast = data?.isLast;
-        this.protocol=data?.protocol;
-        this.name = data?.name;
-        this.payIndex=data?.payIndex;
-        this.ackAddrIndex=data?.ackAddrIndex;
+        this.isLast = data?.isLast??false;
+        this.protocol=data?.protocol??"modbus";
+        this.preamble=data?.preamble??5;
+        this.name = data?.name??"default";
+        this.payIndex=data?.payIndex??0;
+        this.ackAddrIndex=data?.ackAddrIndex??0;
         this.listTag=[]
         this.listVal=[]
         this._userConfQueryItem=data
@@ -311,8 +316,8 @@ abstract class QuItemBase {
         this._setuped=false
     }
     static parseToBuffer(inputStr: string | undefined,erroMessage:string):Buffer{
-        if (inputStr===undefined){
-            throw new Error(erroMessage);
+        if (inputStr==undefined){
+            return Buffer.alloc(0)
         }
         let xstr=inputStr.replaceAll("0x","").replaceAll("0X","").replaceAll(" ","")
         return Buffer.from(xstr.length%2===0?xstr:('0'+xstr),"hex")
@@ -506,8 +511,8 @@ class QuItemModBus extends QuItemBase {
         return retval
     }
     protected parseCode(inputStr:string | undefined): Buffer {
-        if (inputStr===undefined) { return Buffer.alloc(0); }
         let retval=Buffer.alloc(1)
+        if (inputStr===undefined) { return Buffer.alloc(0); }
         retval[0]=Utils.parseVal(inputStr);
         return retval
     }
@@ -528,6 +533,21 @@ class QuItemModBus extends QuItemBase {
             let valItem=new ValItem(item)
             listVal.push(valItem)
         })
+        let code=0x03
+        if (this.code.length>0) { code=this.code[0]
+        }else { code=this.cmd[1] }
+        if (code==0x01 ||code==0x02 ) { // bits type
+            const bitCount = this.modBusFrameInfo.end - this.modBusFrameInfo.start + 1
+            let byteCount = Math.ceil(bitCount / 8)
+            let val=new ValItem({
+                start: (this.payIndex).toString(),
+                end:(this.payIndex+byteCount-1).toString(),
+                covAppIndex:listVal[0]?.covAppIndex,
+                covType:listVal[0]?.covType??"INVALID"
+            })
+            this.txDataLen+=byteCount
+            this.listVal.push(val)
+        }else {
         listVal.forEach(item=>{
             let val=new ValItem({
                 start: (this.payIndex+(item.start-this.modBusFrameInfo.start)*2).toString(),
@@ -541,6 +561,7 @@ class QuItemModBus extends QuItemBase {
             this.txDataLen+=(item.end-item.start+1)*2
             this.listVal.push(val)
         })
+        }
     }
     protected buildCommand(eventPara:EventConfig,upEvent:LoraUpEvent,txIndex:number):void{
         if (this.addr.length>0) { this.addr.copy(this.cmd,0) }
@@ -550,29 +571,178 @@ class QuItemModBus extends QuItemBase {
         }
         this.cmd.writeUInt16BE(this.modBusFrameInfo.start,2)
         this.cmd.writeUInt16BE(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1,4)
-        this.ack=Buffer.alloc(5+(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1)*2);
+        if (this.cmd[1]==0x01 ||this.cmd[1]==0x02 ){
+            const bitCount = this.modBusFrameInfo.end - this.modBusFrameInfo.start + 1
+            let byteCount = Math.ceil(bitCount / 8)
+            this.ack=Buffer.alloc(5+byteCount);
+        }else{
+            this.ack=Buffer.alloc(5+(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1)*2);
+        }
     }
     protected setDefaultTags(){
         if (this.listTag.length!==0) { return; }
         if (this.preCopy.indexCMD!==0 && this.preCopy.indexCMD!==Utils.INVALID_NUM) { this.quEvent.addAckCheckRule(0, this.cmd[0]);}
         if(this.preCopy.indexCMD>1 && this.preCopy.indexCMD!==Utils.INVALID_NUM) {this.quEvent.addAckCheckRule(1, this.cmd[1]);}
-        this.quEvent.addAckCheckRule(2,(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1)*2)
+        if (this.cmd[0]==0x01 ||this.cmd[0]==0x02 ) {
+            const bitCount = this.modBusFrameInfo.end - this.modBusFrameInfo.start + 1
+            let byteCount = Math.ceil(bitCount / 8)
+            this.quEvent.addAckCheckRule(2,byteCount)
+        }else {
+            this.quEvent.addAckCheckRule(2,(this.modBusFrameInfo.end-this.modBusFrameInfo.start+1)*2)
+        }
+    }
+    protected setCrcRules(quEvent: QueryEvent) {
+        this.quEvent.setQueryCrc({
+            Mode: CrcMode.CRC16, placeIndex: -2, LittleEndian: true,
+            crcCheckRange: {startIndex: 0, endIndex: -2}
+        });
+        this.quEvent.setAckCrc({
+            Mode: CrcMode.CRC16, placeIndex: -2, LittleEndian: true,
+            crcCheckRange: {startIndex: 0, endIndex: -2}
+        });
+    }
+}
+class QuItemCJ188 extends QuItemBase {
+    constructor(data?: Partial<UserConfQueryItem>) {
+        super(data);
+    }
+    protected getPayIndex(): number { return 0}
+    protected getAckAddrIndex(): number { return 2}
+    protected parseCmd(inputStr: string | undefined): Buffer{
+        let preamblestr=Array(this.preamble).fill("FE").join("")
+        if (inputStr==undefined) {
+            inputStr=preamblestr+"68aa aaaaaaaaaaaaaa 03 03 810a 00 49 16"
+        }else {
+            inputStr=preamblestr+inputStr
+        }
+        return QuItemAny.parseToBuffer(inputStr,"no cmd")
+    }
+    protected parseAck(inputStr: string | undefined): Buffer{
+        if (inputStr===undefined) { return Buffer.alloc(0);   }
+        inputStr=inputStr.replaceAll("0x","").replaceAll("0X","").replace(/^(FE)+/, "");
+        return QuItemAny.parseToBuffer(inputStr,"no ack")
+    }
+    protected parseAddr(inputStr: string | undefined): Buffer {
+        if (inputStr===undefined) { return Buffer.alloc(0); }
+        inputStr=inputStr.padStart(14,"0")
+        return QuItemAny.parseToBuffer(inputStr,"no cmd")
+    }
+    protected parseCode(inputStr:string | undefined): Buffer {
+        if (inputStr===undefined) { return Buffer.alloc(0); }
+        return QuItemAny.parseToBuffer(inputStr,"no cmd")
+    }
+    protected buildCommand(eventPara:EventConfig,upEvent:LoraUpEvent,txIndex:number):void{
+        if (this.addr.length>0) { this.addr.copy(this.cmd,this.preamble+2) }
+        if (this.code.length>0) { this.code.copy(this.cmd,this.preamble+9) }
+        super.buildCommand(eventPara,upEvent,txIndex); return
+    }
+    protected setDefaultTags(){
+        this.quEvent.addAckCheckRule(0,0x68)
+        this.quEvent.addAckCheckRule(-1,0x16)
+    }
+    protected setCrcRules(quEvent: QueryEvent) {
+        this.quEvent.setQueryCrc({
+            Mode: CrcMode.SUM, CrcLen:1, placeIndex:-2, LittleEndian:true,
+            crcCheckRange:{startIndex:this.preamble, endIndex:-2}
+        })
+        this.quEvent.setAckCrc({
+            Mode: CrcMode.SUM, CrcLen:1, placeIndex:-2, LittleEndian:true,
+            crcCheckRange:{startIndex:0, endIndex:-2}
+        })
     }
 }
 class QuItemDLT64507 extends QuItemBase {
-    constructor(data?: Partial<UserConfQueryItem>) {    super(data);    }
-    protected getPayIndex(): number { return 0}
-    protected getAckAddrIndex(): number { return 1}
-    protected parseCmd(inputStr: string | undefined): Buffer{ return QuItemDLT64507.parseToBuffer(inputStr,"no cmd") }
-    protected parseAck(inputStr: string | undefined): Buffer{ return QuItemDLT64507.parseToBuffer(inputStr,"no ack") }
-    protected setDefaultTags(){
-        new TagItem({index:0,val:"0x68"}).config(this.quEvent)
-        new TagItem({index:7,val:"0x68"}).config(this.quEvent)
-        new TagItem({index:8,val:"0x91"}).config(this.quEvent)
+    constructor(data?: Partial<UserConfQueryItem>) {
+        super(data);
     }
-    protected  setCrcRules(quEvent: QueryEvent) {
-        this.quEvent.setQueryCrc({Mode: CrcMode.SUM, placeIndex: -2, CrcLen:1, crcCheckRange: {startIndex: 4, endIndex: -2}})
-        this.quEvent.setAckCrc({Mode: CrcMode.SUM, placeIndex: -2, CrcLen:1, crcCheckRange: {startIndex: 0, endIndex: -2}})
+    protected getPayIndex(): number { return 0 }
+    protected getAckAddrIndex(): number { return 1 }
+    protected getProtocol(): TypeProtocol { return "DLT64507" }
+    protected parseCmd(inputStr: string | undefined): Buffer {
+        const preamblestr = Array(this.preamble).fill("FE").join("");
+        // 默认报文：
+        // FE FE FE FE 68 AA AA AA AA AA AA 68 11 04 33 33 34 33 CS 16
+        // 其中 11 = 读数据
+        // 04 = 数据标识长度
+        // 33333433 对应 DI 经过 +0x33 处理后的默认值示例
+        if (inputStr === undefined) {
+            inputStr = preamblestr + "68aaaaaaaaaaaa68 11 04 33 33 34 33 00 16";
+        } else {
+            inputStr = preamblestr + inputStr;
+        }
+        return QuItemAny.parseToBuffer(inputStr, "no cmd");
+    }
+    protected parseAck(inputStr: string | undefined): Buffer {
+        if (inputStr === undefined) return Buffer.alloc(0);
+        inputStr = inputStr
+            .replaceAll("0x", "")
+            .replaceAll("0X", "")
+            .replace(/^(FE)+/i, "");
+
+        return QuItemAny.parseToBuffer(inputStr, "no ack");
+    }
+
+    protected parseAddr(inputStr: string | undefined): Buffer {
+        if (inputStr === undefined) return Buffer.alloc(0);
+        // DLT645 地址为 6 字节，通常低位在前
+        const clean = inputStr.replaceAll("0x", "").replaceAll("0X", "").replaceAll(" ", "");
+        const hex = clean.padStart(12, "0");
+        return Buffer.from(hex, "hex");
+    }
+    protected parseCode(inputStr: string | undefined): Buffer {
+        if (inputStr === undefined) return Buffer.alloc(0);
+        return  QuItemAny.parseToBuffer(inputStr, "no ack");
+    }
+    protected buildCommand(eventPara: EventConfig, upEvent: LoraUpEvent, txIndex: number): void {
+        // DLT645-2007:
+        // FE...FE 68 A0 A1 A2 A3 A4 A5 68 C L DATA CS 16
+        // 前导 FE 数量 = this.preamble
+        // 地址起始位置 = preamble + 1
+        // 第二个 68 后一字节为控制码，位置 = preamble + 8
+        if (this.addr.length > 0) {
+            this.addr.copy(this.cmd, this.preamble + 1);
+        }
+        if (this.code.length > 0) {
+            this.code.copy(this.cmd, this.preamble + 8);
+        }
+        super.buildCommand(eventPara, upEvent, txIndex);
+    }
+    protected setDefaultTags() {
+        // 去掉 FE 后，响应帧一般是：
+        // 68 A0 A1 A2 A3 A4 A5 68 91 ...
+        this.quEvent.addAckCheckRule(0, 0x68);
+        this.quEvent.addAckCheckRule(7, 0x68);
+        // 若未指定控制码，默认检查 0x91（读数据正常应答）
+     //   if (this.code.length > 0) {
+     //       this.quEvent.addAckCheckRule(8, this.code[0] | 0x80);
+     //   } else {
+     //       this.quEvent.addAckCheckRule(8, 0x91);
+     //   }
+        this.quEvent.addAckCheckRule(-1, 0x16);
+    }
+
+    protected setCrcRules(quEvent: QueryEvent) {
+        this.quEvent.setQueryCrc({
+            Mode: CrcMode.SUM,
+            CrcLen: 1,
+            placeIndex: -2,
+            LittleEndian: true,
+            crcCheckRange: {
+                startIndex: this.preamble,
+                endIndex: -2
+            }
+        });
+
+        this.quEvent.setAckCrc({
+            Mode: CrcMode.SUM,
+            CrcLen: 1,
+            placeIndex: -2,
+            LittleEndian: true,
+            crcCheckRange: {
+                startIndex: 0,
+                endIndex: -2
+            }
+        });
     }
 }
 class QuItemModBusBitCov extends QuItemModBus {
@@ -645,11 +815,12 @@ class QuItemModBusBitCov extends QuItemModBus {
     }
 }
 /////////////////////////////////////////////////////////////////////////////
-type TypeQuItem=QuItemModBus|QuItemDLT64507|QuItemAny
+type TypeQuItem=QuItemModBus|QuItemDLT64507|QuItemAny|QuItemCJ188
 const QuItemMap = {
     modbus: QuItemModBus,
     DLT64507: QuItemDLT64507,
     modbusBitCov: QuItemModBusBitCov,
+    CJ188:QuItemCJ188,
     any: QuItemAny
 };
 const DEFAULT_QuItem = QuItemAny;
@@ -682,7 +853,11 @@ class EventInfoItem {
         }
     }
     protected protocolBuild( protocol:string) {
-        if(protocol=="DLT64507" && this.eventPara.addrSize<6) { this.eventPara.addrSize=6}
+        if(protocol==="DLT64507" ) {
+            if (this.eventPara.addrSize<6) this.eventPara.addrSize=6
+        }else if (protocol==="CJ188") {
+            this.eventPara.addrSize=7;
+        }
         return
     }
     upEventSetup() {
@@ -711,4 +886,4 @@ class EventInfoItem {
 }
 export {version,Utils,UserConfQueryItem,UserConfUPItem,TypeVal,TypeProtocol,TypeQuItem,QuItemMap,
     ConfigPreCopy,ConfigPeriod,TagItem,ValItem,EventConfig,
-    QuFrameInfo,QuItemBase,QuItemModBus,QuItemModBusBitCov,QuItemDLT64507,EventInfoItem}
+    QuFrameInfo,QuItemBase,QuItemModBus,QuItemModBusBitCov,QuItemDLT64507,QuItemCJ188,EventInfoItem}
