@@ -6,14 +6,16 @@ import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
 import {isTypedArray} from "node:util/types";
-const version="1.02.008"
+const version="1.02.009"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
     |"FloatCDAB"
     |"IntCDAB"
     |"UintCDAB"
+    |"HEX"
     |"INVALID"
+
 type TypeProtocol =
     |"DLT64507"
     |"modbus"
@@ -209,7 +211,28 @@ class ValItem {
             quEvent.pushEBData(
                 upEvent.txBuffer.copy(quEvent.ackBuffer,this.start,this.end-this.start+1,txIndex),
                 {condition:ExprCondition.ONTIME});
-        }else{
+        }else if (this.covType==="HEX"){
+            let sensorDataBufferOffset =  QueryEvent.ebModel.sensorDataBufferOffset;
+            let size=this.end-this.start+1
+            quEvent.pushEBData(
+                EBModel.SENSOR_DATA.copy(
+                    quEvent.ackBuffer,this.start,size,sensorDataBufferOffset
+                ),
+                {condition: ExprCondition.ONTIME}
+            )
+            quEvent.pushEBData(
+                upEvent.txBuffer.writeUint8(
+                    upEvent.txBuffer.readUintBE(txIndex,size).notEqual(EBModel.SENSOR_DATA.readUintBE(sensorDataBufferOffset,size)),
+                    indexCovStatus
+                ),
+                {
+                    condition: ExprCondition.ONTIME,
+                    ActAfterCvt:ActionAfertExpr.UP_TO_RESULT
+                }
+            )
+            QueryEvent.ebModel.sensorDataBufferOffset += size
+            upEvent.pushEBData(upEvent.txBuffer.copy(EBModel.SENSOR_DATA, sensorDataBufferOffset, size, txIndex))
+        }else {
             quEvent.setupCov({
                 ackBufferIndex: this.start,
                 up: {   event: upEvent, txBufferIndex: txIndex},
@@ -583,7 +606,7 @@ class QuItemModBus extends QuItemBase {
         if (this.listTag.length!==0) { return; }
         if (this.preCopy.indexCMD!==0 && this.preCopy.indexCMD!==Utils.INVALID_NUM) { this.quEvent.addAckCheckRule(0, this.cmd[0]);}
         if(this.preCopy.indexCMD>1 && this.preCopy.indexCMD!==Utils.INVALID_NUM) {this.quEvent.addAckCheckRule(1, this.cmd[1]);}
-        if (this.cmd[0]==0x01 ||this.cmd[0]==0x02 ) {
+        if (this.cmd[1]==0x01 ||this.cmd[1]==0x02 ) {
             const bitCount = this.modBusFrameInfo.end - this.modBusFrameInfo.start + 1
             let byteCount = Math.ceil(bitCount / 8)
             this.quEvent.addAckCheckRule(2,byteCount)
