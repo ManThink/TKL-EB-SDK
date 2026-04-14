@@ -6,7 +6,7 @@ import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
 import {isTypedArray} from "node:util/types";
-const version="1.02.009"
+const version="1.02.010"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -604,8 +604,13 @@ class QuItemModBus extends QuItemBase {
     }
     protected setDefaultTags(){
         if (this.listTag.length!==0) { return; }
-        if (this.preCopy.indexCMD!==0 && this.preCopy.indexCMD!==Utils.INVALID_NUM) { this.quEvent.addAckCheckRule(0, this.cmd[0]);}
-        if(this.preCopy.indexCMD>1 && this.preCopy.indexCMD!==Utils.INVALID_NUM) {this.quEvent.addAckCheckRule(1, this.cmd[1]);}
+        if(this.preCopy.indexCMD===Utils.INVALID_NUM) {
+            this.quEvent.addAckCheckRule(0, this.cmd[0]);
+            this.quEvent.addAckCheckRule(1, this.cmd[1]);
+        }else {
+            if (this.preCopy.indexCMD!==0 ) { this.quEvent.addAckCheckRule(0, this.cmd[0]);}
+            if(this.preCopy.indexCMD>1 ) {this.quEvent.addAckCheckRule(1, this.cmd[1]);}
+        }
         if (this.cmd[1]==0x01 ||this.cmd[1]==0x02 ) {
             const bitCount = this.modBusFrameInfo.end - this.modBusFrameInfo.start + 1
             let byteCount = Math.ceil(bitCount / 8)
