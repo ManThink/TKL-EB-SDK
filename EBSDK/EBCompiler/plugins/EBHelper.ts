@@ -6,7 +6,7 @@ import {LoraUpEvent} from "@EBSDK/EBCompiler/EBModel/Event/LoraUpEvent";
 import {Buffer} from "buffer";
 import {CalcData} from "@EBSDK/EBCompiler/EBModel/EBExpr";
 import {isTypedArray} from "node:util/types";
-const version="1.02.010"
+const version="1.02.011"
 type TypeVal =
     SetUpCovDataType
     |"BCD"
@@ -659,6 +659,13 @@ class QuItemCJ188 extends QuItemBase {
         if (inputStr===undefined) { return Buffer.alloc(0); }
         return QuItemAny.parseToBuffer(inputStr,"no cmd")
     }
+    protected parsePreCopy(data?: Partial<UserConfQueryItem>){
+        if (data?.indexAPP===undefined || data?.indexCMD===undefined||data?.copySize===undefined) {
+            return super.parsePreCopy(data)
+        }
+        data.indexCMD=data.indexCMD+this.preamble
+        this.preCopy=new ConfigPreCopy({indexAPP:data.indexAPP, indexCMD:data.indexCMD, copySize:data.copySize})
+    }
     protected buildCommand(eventPara:EventConfig,upEvent:LoraUpEvent,txIndex:number):void{
         if (this.addr.length>0) { this.addr.copy(this.cmd,this.preamble+2) }
         if (this.code.length>0) { this.code.copy(this.cmd,this.preamble+9) }
@@ -720,6 +727,13 @@ class QuItemDLT64507 extends QuItemBase {
     protected parseCode(inputStr: string | undefined): Buffer {
         if (inputStr === undefined) return Buffer.alloc(0);
         return  QuItemAny.parseToBuffer(inputStr, "no ack");
+    }
+    protected parsePreCopy(data?: Partial<UserConfQueryItem>){
+        if (data?.indexAPP===undefined || data?.indexCMD===undefined||data?.copySize===undefined) {
+            return super.parsePreCopy(data)
+        }
+        data.indexCMD=data.indexCMD+this.preamble
+        this.preCopy=new ConfigPreCopy({indexAPP:data.indexAPP, indexCMD:data.indexCMD, copySize:data.copySize})
     }
     protected buildCommand(eventPara: EventConfig, upEvent: LoraUpEvent, txIndex: number): void {
         // DLT645-2007:
